@@ -1,4 +1,4 @@
-# 📊 Data Analysis Toolkit
+#  Data Analysis Toolkit
 
 A fully interactive, browser-based statistical analysis workbench — no installation, no coding required.
 
