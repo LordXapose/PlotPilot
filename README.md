@@ -163,9 +163,7 @@ const model = linearRegression(x, y);
 ---
 
 ## License
-
-MIT License — free to use, modify, and share.
-
+free to use, modify, and share.
 ---
 
 ## Author
