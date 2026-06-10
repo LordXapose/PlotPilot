@@ -1,6 +1,6 @@
 # Plot pilot Analysis Toolkit
 
-A fully interactive, browser-based statistical analysis workbench — no installation, no coding required.
+A fully interactive, browser-based statistical analysis workbench no installation, no coding required.
 
 **[→ Live Demo: Open `index.html` in your browser]**
 
@@ -169,5 +169,4 @@ MIT License — free to use, modify, and share.
 ---
 
 ## Author
-
-Built for the Data Analysis course — Task A toolkit submission.
+KAUSHAL PATIDAR 
