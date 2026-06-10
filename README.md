@@ -2,7 +2,7 @@
 
 A fully interactive, browser-based statistical analysis workbench no installation, no coding required.
 
-**[→ Live Demo: Open `index.html` in your browser]**
+**[→ Live Demo: Open https://lordxapose.github.io/PlotPilot/  in your browser]**
 
 ---
 
