@@ -1,4 +1,4 @@
-#  Data Analysis Toolkit
+# 📊 Data Analysis Toolkit
 
 A fully interactive, browser-based statistical analysis workbench — no installation, no coding required.
 
@@ -136,7 +136,7 @@ const model = linearRegression(x, y);
 
 ## Usage Examples
 
-### Example 1 Load your own CSV
+### Example 1 — Load your own CSV
 ```
 1. Click the "Explorer" tab
 2. Click "Load CSV" and select your file
@@ -144,7 +144,7 @@ const model = linearRegression(x, y);
 4. Switch to any other tab — your data is now active everywhere
 ```
 
-### Example 2 Test if a mean equals a target
+### Example 2 — Test if a mean equals a target
 ```
 1. Go to "Inference" tab
 2. Select your numeric column
@@ -152,7 +152,7 @@ const model = linearRegression(x, y);
 4. Read the t-statistic, p-value, and decision
 ```
 
-### Example 3 Fit a distribution to your data
+### Example 3 — Fit a distribution to your data
 ```
 1. Go to "Distributions" tab
 2. Select "Goodness of Fit"
@@ -164,10 +164,10 @@ const model = linearRegression(x, y);
 
 ## License
 
-MIT License free to use, modify, and share.
+MIT License — free to use, modify, and share.
 
 ---
 
 ## Author
 
-Kaushal patidar 
+Built for the Data Analysis course — Task A toolkit submission.

@@ -3,326 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Analysis Toolkit</title>
+<title>Data Analysis Toolkit v2</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/*  Reset & base  */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#30363d;
-  --border:#30363d;--border2:#484f58;
-  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
-  --blue:#388bfd;--blue2:#1f6feb;--blue3:#0d419d;
-  --cyan:#76e3ea;--green:#3fb950;--amber:#d29922;
-  --red:#f85149;--purple:#bc8cff;--pink:#f778ba;
-  --font:'Inter',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --radius:8px;--radius-lg:12px;
+  --bd:#30363d;--bd2:#484f58;
+  --tx:#e6edf3;--tx2:#8b949e;--tx3:#6e7681;
+  --bl:#388bfd;--bl2:#1f6feb;--bl3:#0d419d;
+  --cy:#76e3ea;--gn:#3fb950;--am:#d29922;
+  --rd:#f85149;--pu:#bc8cff;--pk:#f778ba;
+  --fn:'Inter',system-ui,sans-serif;--mo:'JetBrains Mono',monospace;
+  --r:8px;--rl:12px;
 }
-html{font-size:14px;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.6}
+html{font-size:14px;background:var(--bg);color:var(--tx);font-family:var(--fn);line-height:1.6}
 body{min-height:100vh;display:flex;flex-direction:column}
-
-/*  Scrollbar  */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
-
-/*  Header  */
-#app-header{
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:0 24px;display:flex;align-items:center;gap:16px;height:56px;
-  position:sticky;top:0;z-index:100;
-}
-.logo{
-  width:32px;height:32px;background:linear-gradient(135deg,#388bfd,#bc8cff);
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-}
-.app-title{font-size:15px;font-weight:600;color:var(--text)}
-.app-sub{font-size:12px;color:var(--text2);margin-left:2px}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.file-btn{
-  background:var(--bg3);border:1px solid var(--border2);color:var(--text);
-  padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px;
-  display:flex;align-items:center;gap:6px;transition:background .15s;
-}
-.file-btn:hover{background:var(--bg4)}
-.file-btn.primary{background:var(--blue3);border-color:var(--blue2);color:#fff}
-.file-btn.primary:hover{background:var(--blue2)}
-#file-input{display:none}
-
-/*  Navigation tabs  */
-#nav{
-  background:var(--bg2);border-bottom:1px solid var(--border);
-  display:flex;overflow-x:auto;padding:0 16px;
-  scrollbar-width:none;
-}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+#hdr{background:var(--bg2);border-bottom:1px solid var(--bd);padding:0 20px;display:flex;align-items:center;gap:12px;height:52px;position:sticky;top:0;z-index:200}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,#388bfd,#bc8cff);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#hdr h1{font-size:14px;font-weight:600}.hsub{font-size:11px;color:var(--tx2)}
+.hr{margin-left:auto;display:flex;gap:8px;align-items:center}
+.fbtn{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;transition:background .15s}
+.fbtn:hover{background:var(--bg4)}.fbtn.p{background:var(--bl3);border-color:var(--bl2);color:#fff}.fbtn.p:hover{background:var(--bl2)}
+#fi{display:none}
+#nav{background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;overflow-x:auto;padding:0 12px;scrollbar-width:none}
 #nav::-webkit-scrollbar{display:none}
-.nav-tab{
-  padding:12px 16px;font-size:13px;cursor:pointer;
-  border:none;background:transparent;color:var(--text2);
-  border-bottom:2px solid transparent;white-space:nowrap;
-  display:flex;align-items:center;gap:7px;transition:color .15s;
-}
-.nav-tab:hover{color:var(--text)}
-.nav-tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:500}
-.nav-icon{display:inline-flex;align-items:center;opacity:.85;margin-right:5px;vertical-align:middle}
-
-/*  Main layout  */
-#main{flex:1;padding:20px 24px;max-width:1280px;margin:0 auto;width:100%}
-.tab-panel{display:none}
-.tab-panel.active{display:block}
-
-/*  Cards  */
-.card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:16px;
-}
-.card-title{font-size:13px;font-weight:600;color:var(--text2);
-  text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
-.card-title span{color:var(--blue);text-transform:none;letter-spacing:0;font-weight:500}
-
-/*  Metric cards  */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:18px}
-.metric{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
-.metric-label{font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
-.metric-val{font-size:24px;font-weight:600;font-family:var(--mono)}
-.c-blue{color:var(--blue)}.c-green{color:var(--green)}.c-amber{color:var(--amber)}.c-red{color:var(--red)}.c-purple{color:var(--purple)}.c-cyan{color:var(--cyan)}
-
-/*  Grid  */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}}
-
-/*  Tables  */
-.tbl-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);
-   color:var(--text2);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
-td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text)}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(255,255,255,.03)}
-td.mono{font-family:var(--mono);font-size:12px}
-
-/*  Badges  */
-.badge{display:inline-flex;align-items:center;padding:2px 9px;
-  border-radius:99px;font-size:11px;font-weight:500;letter-spacing:.02em}
-.badge-blue{background:rgba(56,139,253,.15);color:#79c0ff;border:1px solid rgba(56,139,253,.3)}
-.badge-green{background:rgba(63,185,80,.15);color:#7ee787;border:1px solid rgba(63,185,80,.3)}
-.badge-red{background:rgba(248,81,73,.15);color:#ffa198;border:1px solid rgba(248,81,73,.3)}
-.badge-amber{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.3)}
-.badge-purple{background:rgba(188,140,255,.15);color:#d2a8ff;border:1px solid rgba(188,140,255,.3)}
-.badge-null{background:rgba(248,81,73,.2);color:#ff7b72;font-family:var(--mono);font-size:10px}
-
-/*  Forms  */
-.form-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.form-row label{font-size:12px;color:var(--text2);min-width:110px;flex-shrink:0}
-select,input[type=text],input[type=number]{
-  background:var(--bg3);border:1px solid var(--border2);color:var(--text);
-  padding:6px 10px;border-radius:6px;font-size:13px;outline:none;
-}
-select:focus,input:focus{border-color:var(--blue)}
-input[type=range]{
-  width:100%;accent-color:var(--blue);cursor:pointer;flex:1;
-}
-.range-val{font-size:13px;font-weight:600;font-family:var(--mono);
-  min-width:50px;text-align:right;color:var(--text)}
-
-/*  Buttons  */
-.btn-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.btn{
-  background:var(--bg3);border:1px solid var(--border2);color:var(--text2);
-  padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;
-  transition:all .15s;display:inline-flex;align-items:center;gap:5px;
-}
-.btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2)}
-.btn.active{background:rgba(56,139,253,.2);color:var(--blue);border-color:var(--blue2)}
-
-/*  Progress bars  */
-.bar-wrap{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:4px}
-.bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
-.bar-blue{background:var(--blue)}.bar-red{background:var(--red)}
-.bar-green{background:var(--green)}.bar-purple{background:var(--purple)}
-
-/*  Charts  */
-.chart-box{position:relative;width:100%}
-.chart-box canvas{max-width:100%}
-
-/*  Result box  */
-.result{
-  background:var(--bg3);border-radius:var(--radius);padding:14px 16px;
-  border-left:3px solid var(--blue);margin-top:12px;
-}
-.result.pass{border-left-color:var(--green)}
-.result.fail{border-left-color:var(--red)}
-.result.warn{border-left-color:var(--amber)}
-.result-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;
-  text-transform:uppercase;letter-spacing:.06em}
-.result-val{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--blue)}
-.result-sub{font-size:12px;color:var(--text2);margin-top:5px;line-height:1.6}
-.kv-row{display:flex;justify-content:space-between;align-items:center;
-  padding:4px 0;border-bottom:1px solid var(--border);font-size:13px}
-.kv-row:last-child{border-bottom:none}
-.kv-key{color:var(--text2)}
-.kv-val{font-family:var(--mono);font-weight:500}
-
-/*  Tooltip  */
-.tooltip{
-  position:absolute;background:var(--bg4);border:1px solid var(--border2);
-  padding:6px 10px;border-radius:6px;font-size:12px;pointer-events:none;
-  display:none;z-index:200;color:var(--text);
-}
-
-/*  Missing bar  */
-.miss-item{margin-bottom:10px}
-.miss-header{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
-.miss-col{color:var(--text2)}
-.miss-count{font-family:var(--mono);font-weight:500}
-
-/*  QQ plot canvas  */
-#qqCanvas{border-radius:8px}
-
-/*  Guide  */
-.guide-section{margin-bottom:24px}
-.guide-section h2{font-size:16px;font-weight:600;color:var(--blue);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.guide-section h3{font-size:14px;font-weight:600;margin:14px 0 6px}
-.guide-section p,.guide-section li{font-size:13px;color:var(--text2);line-height:1.7}
-.guide-section ul,.guide-section ol{padding-left:20px}
-.guide-section li{margin-bottom:4px}
-.guide-section code{background:var(--bg3);border:1px solid var(--border);
-  padding:1px 6px;border-radius:4px;font-family:var(--mono);font-size:12px;color:var(--cyan)}
-.guide-table th,.guide-table td{font-size:12px}
-
-/*  Corr heatmap  */
-#corrCanvas{border-radius:8px}
-
-/*  Footer  */
-footer{text-align:center;padding:16px;font-size:12px;color:var(--text3);
-  border-top:1px solid var(--border);background:var(--bg2)}
+.nt{padding:10px 13px;font-size:12px;cursor:pointer;border:none;background:transparent;color:var(--tx2);border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+.nt:hover{color:var(--tx)}.nt.on{color:var(--bl);border-bottom-color:var(--bl);font-weight:500}
+#main{flex:1;padding:16px 20px;max-width:1300px;margin:0 auto;width:100%}
+.tp{display:none}.tp.on{display:block}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rl);padding:16px 18px;margin-bottom:14px}
+.ct{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
+.ct span{color:var(--bl);text-transform:none;letter-spacing:0;font-weight:500}
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+.mc{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:12px;text-align:center}
+.ml{font-size:10px;color:var(--tx3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.mv{font-size:22px;font-weight:600;font-family:var(--mo)}
+.cb{color:var(--bl)}.cg{color:var(--gn)}.ca{color:var(--am)}.cr{color:var(--rd)}.cp{color:var(--pu)}.cc{color:var(--cy)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:700px){.g2,.g3{grid-template-columns:1fr}}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{padding:8px 10px;text-align:left;border-bottom:1px solid var(--bd);color:var(--tx2);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+td{padding:7px 10px;border-bottom:1px solid var(--bd);color:var(--tx)}tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02)}
+td.mo{font-family:var(--mo);font-size:11px}
+.bd{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:500}
+.bb{background:rgba(56,139,253,.15);color:#79c0ff;border:1px solid rgba(56,139,253,.25)}
+.bg{background:rgba(63,185,80,.15);color:#7ee787;border:1px solid rgba(63,185,80,.25)}
+.br{background:rgba(248,81,73,.15);color:#ffa198;border:1px solid rgba(248,81,73,.25)}
+.ba{background:rgba(210,153,34,.15);color:#e3b341;border:1px solid rgba(210,153,34,.25)}
+.bp{background:rgba(188,140,255,.15);color:#d2a8ff;border:1px solid rgba(188,140,255,.25)}
+.bn{background:rgba(248,81,73,.2);color:#ff7b72;font-family:var(--mo);font-size:10px}
+.fr{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fr label{font-size:11px;color:var(--tx2);min-width:90px;flex-shrink:0}
+select,input[type=text],input[type=number]{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx);padding:5px 9px;border-radius:6px;font-size:12px;outline:none}
+select:focus,input:focus{border-color:var(--bl)}
+input[type=range]{accent-color:var(--bl);cursor:pointer;flex:1}
+.rv{font-size:12px;font-weight:600;font-family:var(--mo);min-width:44px;text-align:right;color:var(--tx)}
+.bg2{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.btn{background:var(--bg3);border:1px solid var(--bd2);color:var(--tx2);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:var(--bg4);color:var(--tx)}.btn.on{background:rgba(56,139,253,.2);color:var(--bl);border-color:var(--bl2)}
+.bw{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:3px}
+.bf{height:100%;border-radius:3px}
+.ch{position:relative;width:100%}
+.res{background:var(--bg3);border-radius:var(--r);padding:12px 14px;border-left:3px solid var(--bl);margin-top:10px}
+.res.ok{border-left-color:var(--gn)}.res.ko{border-left-color:var(--rd)}.res.wa{border-left-color:var(--am)}
+.rt2{font-size:10px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.rv2{font-size:24px;font-weight:700;font-family:var(--mo);color:var(--bl)}
+.rs{font-size:11px;color:var(--tx2);margin-top:5px;line-height:1.6}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.kv:last-child{border-bottom:none}.kk{color:var(--tx2)}.kval{font-family:var(--mo);font-weight:500}
+.mi{margin-bottom:8px}
+.mh{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.sc{background:var(--bg3);border-radius:var(--r);padding:14px;margin-bottom:10px;border-left:3px solid var(--bl)}
+.si{font-size:10px;font-weight:700;font-family:var(--mo);letter-spacing:.08em;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.08);display:inline-block;margin-bottom:7px;color:var(--tx2)}
+.st{font-size:13px;font-weight:500;margin-bottom:4px}
+.sb{font-size:12px;color:var(--tx2);line-height:1.7}
+.gs h2{font-size:14px;font-weight:600;color:var(--bl);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bd)}
+.gs h3{font-size:12px;font-weight:600;margin:12px 0 5px}.gs p,.gs li{font-size:12px;color:var(--tx2);line-height:1.7}
+.gs ul{padding-left:18px}.gs li{margin-bottom:3px}
+code{background:var(--bg3);border:1px solid var(--bd);padding:1px 5px;border-radius:4px;font-family:var(--mo);font-size:11px;color:var(--cy)}
+footer{text-align:center;padding:14px;font-size:11px;color:var(--tx3);border-top:1px solid var(--bd);background:var(--bg2)}
 </style>
 </head>
 <body>
-
-<!-- Header -->
-<header id="app-header">
+<header id="hdr">
   <div class="logo"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="3" height="7" fill="white" rx="1"/><rect x="6" y="5" width="3" height="10" fill="white" rx="1"/><rect x="11" y="2" width="3" height="13" fill="white" rx="1"/></svg></div>
-  <div>
-    <div class="app-title">Data Analysis Toolkit</div>
-    <div class="app-sub">Interactive statistical workbench</div>
-  </div>
-  <div class="header-right">
-    <input type="file" id="file-input" accept=".csv,.tsv">
-    <button class="file-btn primary" onclick="document.getElementById('file-input').click()">
-      ↑ Load CSV
-    </button>
-    <button class="file-btn" onclick="exportCSV()">↓ Export</button>
+  <div><h1>Data Analysis Toolkit <span style="color:var(--bl);font-size:11px;font-weight:400">v2.0</span></h1><div class="hsub">16-module statistical workbench</div></div>
+  <div class="hr">
+    <input type="file" id="fi" accept=".csv,.tsv">
+    <button class="fbtn p" onclick="document.getElementById('fi').click()">Load CSV</button>
+    <button class="fbtn" onclick="exportCSV()">Export CSV</button>
+    <button class="fbtn" onclick="switchTab('story')">Auto-Insights</button>
   </div>
 </header>
-
-<!-- Navigation -->
 <nav id="nav">
-  <button class="nav-tab active" data-tab="explorer"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><line x1="1" y1="5" x2="15" y2="5" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="5" x2="5" y2="15" stroke="currentColor" stroke-width="1.5"/></svg></span>Data Explorer</button>
-  <button class="nav-tab" data-tab="stats"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="3" height="7" fill="currentColor" rx="1"/><rect x="6.5" y="4" width="3" height="11" fill="currentColor" rx="1"/><rect x="12" y="1" width="3" height="14" fill="currentColor" rx="1"/></svg></span>Descriptive Stats</button>
-  <button class="nav-tab" data-tab="viz"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><polyline points="1,12 5,7 9,9 15,2" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="7" r="1.5" fill="currentColor"/><circle cx="9" cy="9" r="1.5" fill="currentColor"/></svg></span>Visualizations</button>
-  <button class="nav-tab" data-tab="dist"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M1 12 Q4 2 8 2 Q12 2 15 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><line x1="1" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1" opacity="0.5"/></svg></span>Distributions</button>
-  <button class="nav-tab" data-tab="inference"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="5" x2="8" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="8" cy="11" r="1" fill="currentColor"/></svg></span>Inference</button>
-  <button class="nav-tab" data-tab="regression"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="3" cy="12" r="1.5" fill="currentColor"/><circle cx="6" cy="9" r="1.5" fill="currentColor"/><circle cx="9" cy="7" r="1.5" fill="currentColor"/><circle cx="13" cy="4" r="1.5" fill="currentColor"/><line x1="1" y1="13" x2="15" y2="3" stroke="currentColor" stroke-width="1" opacity="0.5" stroke-dasharray="2 2"/></svg></span>Regression</button>
-  <button class="nav-tab" data-tab="probability"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="1.5" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><text x="3.5" y="11.5" font-size="8" fill="currentColor" font-family="monospace">P(x)</text></svg></span>Probability Calc</button>
-  <button class="nav-tab" data-tab="guide"><span class="nav-icon"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="10" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><line x1="5" y1="5" x2="9" y2="5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="10" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="11" x2="8" y2="11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><rect x="10" y="8" width="4" height="5" rx="1" fill="currentColor" opacity="0.6"/></svg></span>Guide</button>
+  <button class="nt on" data-tab="explorer">Explorer</button>
+  <button class="nt" data-tab="clean">Cleaning</button>
+  <button class="nt" data-tab="stats">Descriptive</button>
+  <button class="nt" data-tab="viz">Visualizations</button>
+  <button class="nt" data-tab="dist">Distributions</button>
+  <button class="nt" data-tab="inference">Inference</button>
+  <button class="nt" data-tab="anova">ANOVA</button>
+  <button class="nt" data-tab="regression">Regression</button>
+  <button class="nt" data-tab="multiReg">Multi-Regression</button>
+  <button class="nt" data-tab="timeseries">Time Series</button>
+  <button class="nt" data-tab="sampling">Sampling &amp; Power</button>
+  <button class="nt" data-tab="chi">Chi-Squared</button>
+  <button class="nt" data-tab="probability">Probability Calc</button>
+  <button class="nt" data-tab="story">Data Story</button>
+  <button class="nt" data-tab="guide">Guide</button>
 </nav>
-
 <main id="main">
 
-<!--  TAB: EXPLORER  -->
-<section class="tab-panel active" id="tab-explorer">
-  <div class="metrics" id="explorer-metrics"></div>
-  <div class="grid2">
-    <div class="card">
-      <div class="card-title">Missing value analysis</div>
-      <div id="missing-bars"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Column schema</div>
-      <div class="tbl-wrap">
-        <table id="schema-table">
-          <thead><tr><th>Column</th><th>Type</th><th>Unique</th><th>Missing</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
+<!-- EXPLORER -->
+<div class="tp on" id="tab-explorer">
+  <div class="mrow" id="ex-m"></div>
+  <div class="g2">
+    <div class="card"><div class="ct">Missing value analysis</div><div id="ex-miss"></div></div>
+    <div class="card"><div class="ct">Column schema</div><div class="tw"><table id="ex-schema"><thead><tr><th>Column</th><th>Type</th><th>Unique</th><th>Missing</th></tr></thead><tbody></tbody></table></div></div>
   </div>
-  <div class="card">
-    <div class="card-title">Data preview — first 10 rows</div>
-    <div class="tbl-wrap" id="preview-wrap"></div>
-  </div>
-</section>
+  <div class="card"><div class="ct">Data preview — first 12 rows</div><div class="tw" id="ex-prev"></div></div>
+</div>
 
-<!--  TAB: DESCRIPTIVE  -->
-<section class="tab-panel" id="tab-stats">
+<!-- CLEANING -->
+<div class="tp" id="tab-clean">
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Impute missing values</div>
+      <div class="fr"><label>Column</label><select id="cl-col"></select></div>
+      <div class="fr"><label>Strategy</label><select id="cl-strat"><option value="mean">Mean</option><option value="median">Median</option><option value="mode">Mode</option><option value="zero">Zero</option><option value="forward">Forward fill</option></select></div>
+      <button class="btn on" onclick="doImpute()">Apply imputation</button>
+      <div id="cl-res"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Outlier detection</div>
+      <div class="fr"><label>Column</label><select id="out-col"></select></div>
+      <div class="fr"><label>Method</label><select id="out-meth"><option value="iqr">IQR (1.5x)</option><option value="iqr3">IQR (3x) extreme</option><option value="z">Z-score (|z|>3)</option></select></div>
+      <button class="btn on" onclick="detectOut()">Detect outliers</button>
+      <div id="out-res"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Normalize / Standardize</div>
+      <div class="fr"><label>Column</label><select id="nm-col"></select></div>
+      <div class="fr"><label>Method</label><select id="nm-meth"><option value="minmax">Min-Max [0,1]</option><option value="zscore">Z-score</option><option value="log">Log transform</option></select></div>
+      <button class="btn on" onclick="doNorm()">Preview</button>
+      <div id="nm-res"></div>
+      <div class="ch" style="height:140px;margin-top:8px"><canvas id="nmChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Row filter</div>
+      <div class="fr"><label>Column</label><select id="fl-col"></select></div>
+      <div class="fr"><label>Condition</label>
+        <select id="fl-op"><option value=">">&gt;</option><option value="<">&lt;</option><option value=">=">&gt;=</option><option value="<=">&lt;=</option><option value="==">==</option></select>
+        <input type="number" id="fl-val" style="width:80px" placeholder="value">
+      </div>
+      <button class="btn on" onclick="doFilter()">Preview filter</button>
+      <div id="fl-res"></div>
+    </div>
+  </div>
   <div class="card">
-    <div class="form-row">
-      <label>Select column</label>
-      <select id="stats-col"></select>
+    <div class="ct">Binning (discretize)</div>
+    <div class="fr"><label>Column</label><select id="bn-col"></select>
+      <label>Bins: <span id="bn-nv">4</span></label><input type="range" id="bn-n" min="2" max="10" value="4" oninput="document.getElementById('bn-nv').textContent=this.value">
+      <label>Method</label><select id="bn-m"><option value="cut">Equal width</option><option value="qcut">Equal frequency</option></select>
     </div>
-    <div class="card-title">Summary — <span id="stats-col-name"></span></div>
-    <div class="grid2">
-      <div>
-        <div id="stats-kv-left"></div>
-      </div>
-      <div>
-        <div id="stats-kv-right"></div>
-        <div style="margin-top:16px">
-          <div class="card-title">Five-number summary</div>
-          <div id="five-num"></div>
-        </div>
-      </div>
-    </div>
+    <button class="btn on" onclick="doBin()">Compute bins</button>
+    <div id="bn-res" style="margin-top:8px"></div>
   </div>
-  <div class="grid2">
-    <div class="card">
-      <div class="card-title">Frequency distribution</div>
-      <div class="tbl-wrap" id="freq-table-wrap"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Distribution shape</div>
-      <div class="chart-box" style="height:220px"><canvas id="statsHistChart"></canvas></div>
-    </div>
-  </div>
-</section>
+</div>
 
-<!--  TAB: VISUALIZATIONS  -->
-<section class="tab-panel" id="tab-viz">
+<!-- DESCRIPTIVE -->
+<div class="tp" id="tab-stats">
   <div class="card">
-    <div class="btn-group" id="viz-type-btns">
-      <button class="btn active" data-viz="histogram">Histogram</button>
+    <div class="fr"><label>Column</label><select id="st-col" onchange="drawStats()"></select>
+      <button class="btn on" onclick="toggleAllStats()">Full summary table</button></div>
+    <div class="ct">Summary — <span id="st-cn"></span></div>
+    <div class="g2"><div id="st-l"></div><div><div id="st-r"></div><div style="margin-top:14px"><div class="ct">Five-number summary</div><div id="st-five"></div></div></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Frequency table</div><div class="tw" id="st-freq"></div></div>
+    <div class="card"><div class="ct">Distribution shape</div><div class="ch" style="height:200px"><canvas id="stHist"></canvas></div></div>
+  </div>
+  <div class="card" id="all-st" style="display:none"><div class="ct">All numeric columns</div><div class="tw" id="all-st-tbl"></div></div>
+</div>
+
+<!-- VISUALIZATIONS -->
+<div class="tp" id="tab-viz">
+  <div class="card">
+    <div class="bg2" id="viz-btns">
+      <button class="btn on" data-viz="hist">Histogram</button>
       <button class="btn" data-viz="scatter">Scatter</button>
-      <button class="btn" data-viz="boxplot">Box plot</button>
+      <button class="btn" data-viz="box">Box plot</button>
       <button class="btn" data-viz="bar">Bar chart</button>
-      <button class="btn" data-viz="corr">Correlation matrix</button>
+      <button class="btn" data-viz="line">Line chart</button>
+      <button class="btn" data-viz="corr">Correlation</button>
+      <button class="btn" data-viz="bubble">Bubble</button>
+      <button class="btn" data-viz="area">Area</button>
     </div>
-    <div id="viz-controls" class="form-row"></div>
-    <div class="card-title" id="viz-title">Histogram</div>
-    <div class="chart-box" style="height:300px"><canvas id="mainVizChart"></canvas></div>
+    <div id="viz-ctrl" class="fr"></div>
+    <div class="ct" id="viz-ttl">Histogram</div>
+    <div class="ch" style="height:280px"><canvas id="mainViz"></canvas></div>
   </div>
-  <div class="grid2" id="viz-secondary">
-    <div class="card">
-      <div class="card-title">Category distribution</div>
-      <div class="chart-box" style="height:200px"><canvas id="catChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Pairwise comparison</div>
-      <div class="chart-box" style="height:200px"><canvas id="pairChart"></canvas></div>
-    </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Category distribution</div><div class="ch" style="height:180px"><canvas id="catViz"></canvas></div></div>
+    <div class="card"><div class="ct">Group comparison</div><div class="ch" style="height:180px"><canvas id="grpViz"></canvas></div></div>
   </div>
-</section>
+</div>
 
-<!--  TAB: DISTRIBUTIONS  -->
-<section class="tab-panel" id="tab-dist">
+<!-- DISTRIBUTIONS -->
+<div class="tp" id="tab-dist">
   <div class="card">
-    <div class="btn-group" id="dist-type-btns">
-      <button class="btn active" data-dist="normal">Normal</button>
+    <div class="bg2" id="dist-btns">
+      <button class="btn on" data-dist="normal">Normal</button>
       <button class="btn" data-dist="exponential">Exponential</button>
       <button class="btn" data-dist="uniform">Uniform</button>
       <button class="btn" data-dist="binomial">Binomial</button>
@@ -330,1145 +228,451 @@ footer{text-align:center;padding:16px;font-size:12px;color:var(--text3);
       <button class="btn" data-dist="t">Student t</button>
     </div>
     <div id="dist-params"></div>
-    <div class="grid2">
-      <div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">PDF / PMF</div>
-        <div class="chart-box" style="height:200px"><canvas id="pdfChart"></canvas></div>
-      </div>
-      <div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">CDF</div>
-        <div class="chart-box" style="height:200px"><canvas id="cdfChart"></canvas></div>
-      </div>
+    <div class="g2">
+      <div><div style="font-size:10px;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">PDF / PMF</div><div class="ch" style="height:190px"><canvas id="pdfC"></canvas></div></div>
+      <div><div style="font-size:10px;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">CDF</div><div class="ch" style="height:190px"><canvas id="cdfC"></canvas></div></div>
     </div>
-    <div id="dist-stats" style="margin-top:14px"></div>
+    <div id="dist-stats" style="margin-top:12px"></div>
   </div>
   <div class="card">
-    <div class="card-title">Goodness-of-Fit Test</div>
-    <div class="form-row">
-      <label>Column</label>
-      <select id="gof-col"></select>
-      <label>Target dist.</label>
-      <select id="gof-dist">
-        <option value="normal">Normal</option>
-        <option value="exponential">Exponential</option>
-        <option value="uniform">Uniform</option>
-      </select>
-    </div>
-    <div class="grid2">
-      <div id="gof-result"></div>
-      <div>
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Q-Q Plot</div>
-        <div class="chart-box" style="height:180px"><canvas id="qqChart"></canvas></div>
-      </div>
-    </div>
+    <div class="ct">Goodness-of-Fit — KS Test</div>
+    <div class="fr"><label>Column</label><select id="gof-col"></select><label>Distribution</label><select id="gof-dist"><option value="normal">Normal</option><option value="exponential">Exponential</option><option value="uniform">Uniform</option></select></div>
+    <div class="g2"><div id="gof-res"></div><div><div style="font-size:10px;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em">Q-Q Plot</div><div class="ch" style="height:170px"><canvas id="qqC"></canvas></div></div></div>
   </div>
-</section>
+</div>
 
-<!--  TAB: INFERENCE  -->
-<section class="tab-panel" id="tab-inference">
-  <div class="grid2">
+<!-- INFERENCE -->
+<div class="tp" id="tab-inference">
+  <div class="g2">
     <div class="card">
-      <div class="card-title">Confidence interval</div>
-      <div class="form-row">
-        <label>Column</label>
-        <select id="ci-col"></select>
-      </div>
-      <div class="form-row">
-        <label>Confidence level</label>
-        <input type="range" id="ci-level" min="80" max="99" value="95" step="1">
-        <span class="range-val" id="ci-level-val">95%</span>
-      </div>
-      <div id="ci-result"></div>
+      <div class="ct">Confidence interval</div>
+      <div class="fr"><label>Column</label><select id="ci-col" onchange="drawCI()"></select></div>
+      <div class="fr"><label>Level: <span id="ci-lv">95</span>%</label><input type="range" id="ci-lvl" min="80" max="99" value="95" oninput="document.getElementById('ci-lv').textContent=this.value;drawCI()"></div>
+      <div id="ci-res"></div>
     </div>
     <div class="card">
-      <div class="card-title">One-sample t-test</div>
-      <div class="form-row">
-        <label>Column</label>
-        <select id="ttest-col"></select>
-      </div>
-      <div class="form-row">
-        <label>H₀: μ =</label>
-        <input type="range" id="ttest-mu" min="0" max="100000" value="75" step="0.5">
-        <span class="range-val" id="ttest-mu-val">75</span>
-      </div>
-      <div class="form-row">
-        <label>Alpha (α)</label>
-        <select id="ttest-alpha">
-          <option value="0.01">0.01</option>
-          <option value="0.05" selected>0.05</option>
-          <option value="0.10">0.10</option>
-        </select>
-      </div>
-      <div id="ttest-result"></div>
+      <div class="ct">One-sample t-test</div>
+      <div class="fr"><label>Column</label><select id="tt-col" onchange="drawTT()"></select></div>
+      <div class="fr"><label>H0: mu = <span id="tt-mv">75</span></label><input type="range" id="tt-mu" min="0" max="100000" value="75" step="0.5" oninput="document.getElementById('tt-mv').textContent=this.value;drawTT()"></div>
+      <div class="fr"><label>Alpha</label><select id="tt-alpha" onchange="drawTT()"><option value="0.01">0.01</option><option value="0.05" selected>0.05</option><option value="0.10">0.10</option></select></div>
+      <div id="tt-res"></div>
     </div>
   </div>
-  <div class="grid2">
+  <div class="g2">
     <div class="card">
-      <div class="card-title">Two-sample t-test</div>
-      <div class="form-row">
-        <label>Column</label>
-        <select id="ttest2-col"></select>
-      </div>
-      <div class="form-row">
-        <label>Group by</label>
-        <select id="ttest2-group"></select>
-      </div>
-      <div id="ttest2-result"></div>
+      <div class="ct">Two-sample t-test (Welch)</div>
+      <div class="fr"><label>Column</label><select id="tt2-col" onchange="drawTT2()"></select></div>
+      <div class="fr"><label>Group by</label><select id="tt2-grp" onchange="drawTT2()"></select></div>
+      <div id="tt2-res"></div>
     </div>
     <div class="card">
-      <div class="card-title">Normality test</div>
-      <div class="form-row">
-        <label>Column</label>
-        <select id="norm-col"></select>
-      </div>
-      <div id="norm-result"></div>
+      <div class="ct">Normality test</div>
+      <div class="fr"><label>Column</label><select id="nt-col" onchange="drawNT()"></select></div>
+      <div id="nt-res"></div>
     </div>
   </div>
-</section>
+</div>
 
-<!--  TAB: REGRESSION  -->
-<section class="tab-panel" id="tab-regression">
+<!-- ANOVA -->
+<div class="tp" id="tab-anova">
   <div class="card">
-    <div class="form-row">
-      <label>X (predictor)</label>
-      <select id="reg-x"></select>
-      <label>Y (response)</label>
-      <select id="reg-y"></select>
-    </div>
-    <div class="grid2">
-      <div>
-        <div class="card-title">Model equation</div>
-        <div id="reg-equation" style="font-size:20px;font-family:var(--mono);font-weight:600;color:var(--cyan);padding:12px 0"></div>
-        <div id="reg-metrics-kv"></div>
-      </div>
-      <div>
-        <div class="card-title">Coefficients</div>
-        <div class="tbl-wrap" id="reg-coef-table"></div>
-      </div>
+    <div class="ct">One-Way ANOVA</div>
+    <div class="fr"><label>Numeric col</label><select id="av-col"></select><label>Group by</label><select id="av-grp"></select></div>
+    <button class="btn on" onclick="runAnova()">Run ANOVA</button>
+    <div id="av-res"></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Tukey HSD post-hoc</div><div id="tukey-res"><p style="color:var(--tx2);font-size:12px">Run ANOVA first.</p></div></div>
+    <div class="card"><div class="ct">Group means</div><div class="ch" style="height:200px"><canvas id="avChart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- REGRESSION -->
+<div class="tp" id="tab-regression">
+  <div class="card">
+    <div class="fr"><label>X (predictor)</label><select id="rx" onchange="drawReg()"></select><label>Y (response)</label><select id="ry" onchange="drawReg()"></select></div>
+    <div class="g2">
+      <div><div class="ct">Model equation</div><div id="req" style="font-size:18px;font-family:var(--mo);font-weight:600;color:var(--cy);padding:10px 0"></div><div id="rkv"></div></div>
+      <div><div class="ct">Coefficients</div><div class="tw" id="rcoef"></div></div>
     </div>
   </div>
-  <div class="grid2">
-    <div class="card">
-      <div class="card-title">Scatter with regression line</div>
-      <div class="chart-box" style="height:250px"><canvas id="regScatterChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Residuals vs fitted</div>
-      <div class="chart-box" style="height:250px"><canvas id="residChart"></canvas></div>
-    </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Scatter + regression line</div><div class="ch" style="height:230px"><canvas id="rScatter"></canvas></div></div>
+    <div class="card"><div class="ct">Residuals vs fitted</div><div class="ch" style="height:230px"><canvas id="rResid"></canvas></div></div>
   </div>
   <div class="card">
-    <div class="card-title">Predict</div>
-    <div class="form-row">
-      <label>New x value</label>
-      <input type="number" id="pred-x" style="width:120px" placeholder="e.g. 35">
-      <button class="btn" onclick="runPrediction()">Predict →</button>
-    </div>
-    <div id="pred-result"></div>
+    <div class="ct">Predict</div>
+    <div class="fr"><label>x =</label><input type="number" id="px" style="width:110px" placeholder="e.g. 35"><button class="btn on" onclick="doPred()">Predict</button></div>
+    <div id="pred-res"></div>
   </div>
-</section>
+</div>
 
-<!--  TAB: PROBABILITY CALC  -->
-<section class="tab-panel" id="tab-probability">
-  <div class="grid2">
+<!-- MULTIPLE REGRESSION -->
+<div class="tp" id="tab-multiReg">
+  <div class="card">
+    <div class="ct">Multiple linear regression</div>
+    <div class="fr" style="flex-wrap:wrap;gap:8px"><label>Predictors (X)</label><div id="mr-x-checks" style="display:flex;flex-wrap:wrap;gap:8px"></div></div>
+    <div class="fr"><label>Response (Y)</label><select id="mr-y"></select></div>
+    <button class="btn on" onclick="runMR()">Fit model</button>
+    <div id="mr-res"></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Fitted vs actual</div><div class="ch" style="height:220px"><canvas id="mrFit"></canvas></div></div>
+    <div class="card"><div class="ct">Residuals</div><div class="ch" style="height:220px"><canvas id="mrResid"></canvas></div></div>
+  </div>
+</div>
+
+<!-- TIME SERIES -->
+<div class="tp" id="tab-timeseries">
+  <div class="card">
+    <div class="fr"><label>Column</label><select id="ts-col" onchange="drawTS()"></select>
+      <label>MA window: <span id="ts-wv">5</span></label><input type="range" id="ts-w" min="2" max="10" value="5" oninput="document.getElementById('ts-wv').textContent=this.value;drawTS()">
+      <label>Smooth a: <span id="ts-av">0.3</span></label><input type="range" id="ts-a" min="0.05" max="0.95" step="0.05" value="0.3" oninput="document.getElementById('ts-av').textContent=this.value;drawTS()">
+    </div>
+    <div class="ct">Original + trend + smoothed</div>
+    <div class="ch" style="height:250px"><canvas id="tsChart"></canvas></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Autocorrelation (ACF)</div><div class="ch" style="height:190px"><canvas id="acfChart"></canvas></div></div>
+    <div class="card"><div class="ct">Stationarity &amp; trend</div><div id="ts-stats"></div></div>
+  </div>
+</div>
+
+<!-- SAMPLING & POWER -->
+<div class="tp" id="tab-sampling">
+  <div class="g2">
     <div class="card">
-      <div class="card-title">Setup</div>
-      <div class="form-row">
-        <label>Distribution</label>
-        <select id="prob-dist">
-          <option value="normal">Normal</option>
-          <option value="exponential">Exponential</option>
-          <option value="uniform">Uniform</option>
-          <option value="t">Student t</option>
-        </select>
-      </div>
-      <div id="prob-params"></div>
-      <div class="form-row" style="margin-top:8px">
-        <label>Query type</label>
-        <select id="prob-type">
-          <option value="leq">P(X ≤ x)</option>
-          <option value="geq">P(X ≥ x)</option>
-          <option value="between">P(a ≤ X ≤ b)</option>
-          <option value="inv">Inverse: find x given p</option>
-        </select>
-      </div>
-      <div id="prob-query-inputs"></div>
-      <button class="btn active" style="margin-top:10px" onclick="calcProbability()">Calculate</button>
-      <div id="prob-result" style="margin-top:12px"></div>
+      <div class="ct">Central Limit Theorem demo</div>
+      <div class="fr"><label>Column</label><select id="clt-col" onchange="drawCLT()"></select></div>
+      <div class="fr"><label>Sample size n: <span id="clt-nv">10</span></label><input type="range" id="clt-n" min="2" max="50" value="10" oninput="document.getElementById('clt-nv').textContent=this.value;drawCLT()"></div>
+      <div class="fr"><label>Iterations: <span id="clt-iv">500</span></label><input type="range" id="clt-i" min="100" max="2000" step="100" value="500" oninput="document.getElementById('clt-iv').textContent=this.value;drawCLT()"></div>
+      <div id="clt-stats"></div>
+      <div class="ch" style="height:160px;margin-top:8px"><canvas id="cltChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-title">Distribution curve</div>
-      <div class="chart-box" style="height:250px"><canvas id="probChart"></canvas></div>
+      <div class="ct">Bootstrap confidence interval</div>
+      <div class="fr"><label>Column</label><select id="boot-col"></select></div>
+      <div class="fr"><label>Statistic</label><select id="boot-stat"><option value="mean">Mean</option><option value="median">Median</option><option value="sd">Std dev</option></select></div>
+      <div class="fr"><label>B resamples: <span id="boot-bv">1000</span></label><input type="range" id="boot-b" min="200" max="3000" step="200" value="1000" oninput="document.getElementById('boot-bv').textContent=this.value"></div>
+      <button class="btn on" onclick="runBoot()">Run bootstrap</button>
+      <div id="boot-res"></div>
     </div>
   </div>
-</section>
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Sample size calculator</div>
+      <div class="fr"><label>Goal</label><select id="ss-goal"><option value="mean">Estimate mean</option><option value="prop">Estimate proportion</option></select></div>
+      <div class="fr"><label>Margin of error</label><input type="number" id="ss-me" value="5" style="width:70px"></div>
+      <div class="fr"><label>Sigma / p-hat</label><input type="number" id="ss-sigma" value="15" style="width:70px"></div>
+      <div class="fr"><label>Alpha</label><select id="ss-alpha"><option value="0.05">0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></div>
+      <button class="btn on" onclick="calcSS()">Calculate n</button>
+      <div id="ss-res"></div>
+    </div>
+    <div class="card">
+      <div class="ct">Statistical power curve</div>
+      <div class="fr"><label>Effect size (d): <span id="pw-dv">0.5</span></label><input type="range" id="pw-d" min="0.1" max="2" step="0.1" value="0.5" oninput="document.getElementById('pw-dv').textContent=this.value;drawPower()"></div>
+      <div class="fr"><label>Alpha</label><select id="pw-alpha" onchange="drawPower()"><option value="0.05">0.05</option><option value="0.01">0.01</option></select></div>
+      <div class="ch" style="height:190px"><canvas id="pwChart"></canvas></div>
+    </div>
+  </div>
+</div>
 
-<!--  TAB: GUIDE  -->
-<section class="tab-panel" id="tab-guide">
-  <div class="card guide-section">
-    <h2> Data Analysis Toolkit — User Guide</h2>
-    <p>A self-contained, browser-based statistical workbench. No installation, no server, no coding required. All calculations run locally in your browser.</p>
+<!-- CHI-SQUARED -->
+<div class="tp" id="tab-chi">
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Chi-squared independence test</div>
+      <div class="fr"><label>Row variable</label><select id="chi-row"></select></div>
+      <div class="fr"><label>Column variable</label><select id="chi-col2"></select></div>
+      <button class="btn on" onclick="runChi()">Run test</button>
+      <div id="chi-res"></div>
+    </div>
+    <div class="card"><div class="ct">Observed frequency table</div><div class="tw" id="chi-tbl"></div></div>
   </div>
-  <div class="card guide-section">
-    <h2> Data Explorer</h2>
-    <p>Load and inspect your dataset. Supports CSV and TSV files. The toolkit auto-detects column types and flags missing values.</p>
-    <h3>Features</h3>
-    <ul>
-      <li>Upload CSV via <code>Load CSV</code> button</li>
-      <li>Visual missing-value bars per column</li>
-      <li>Column schema: type, unique count, missing count</li>
-      <li>Scrollable data preview (first 10 rows)</li>
-      <li>Export current data as CSV</li>
-    </ul>
-  </div>
-  <div class="card guide-section">
-    <h2> Descriptive Statistics</h2>
-    <p>Full summary statistics for any numeric column: mean, median, mode, SD, variance, skewness, kurtosis, IQR, CV, SEM, and more.</p>
-    <h3>Interpretation tips</h3>
-    <ul>
-      <li>|Skewness| &gt; 1: noticeably skewed distribution</li>
-      <li>Kurtosis &gt; 2: heavier tails than normal</li>
-      <li>CV &gt; 30%: high relative variability</li>
-      <li>Mean ≠ Median: likely skewed or outliers present</li>
-    </ul>
-  </div>
-  <div class="card guide-section">
-    <h2> Visualizations</h2>
-    <ul>
-      <li><strong>Histogram:</strong> distribution shape of one variable (adjust bins)</li>
-      <li><strong>Scatter:</strong> relationship between two numeric variables</li>
-      <li><strong>Box plot:</strong> five-number summary + outliers per group</li>
-      <li><strong>Bar chart:</strong> category frequencies</li>
-      <li><strong>Correlation matrix:</strong> pairwise Pearson r for all numeric columns</li>
-    </ul>
-  </div>
-  <div class="card guide-section">
-    <h2> Probability Distributions</h2>
-    <p>Visualize PDF and CDF for Normal, Exponential, Uniform, Binomial, Poisson, and Student t distributions. Parameters adjust in real time.</p>
-    <p style="margin-top:8px">The <strong>Goodness-of-Fit</strong> panel runs a Kolmogorov-Smirnov test: if D &lt; D_critical, your data is consistent with the chosen distribution.</p>
-  </div>
-  <div class="card guide-section">
-    <h2> Statistical Inference</h2>
-    <ul>
-      <li><strong>Confidence interval:</strong> range for the true mean at chosen level (80%–99%)</li>
-      <li><strong>One-sample t-test:</strong> test if mean equals a specified value</li>
-      <li><strong>Two-sample t-test:</strong> compare means of two groups (Welch's)</li>
-      <li><strong>Normality test:</strong> Jarque-Bera + Shapiro-Wilk approximation</li>
-    </ul>
-    <h3>p-value guide</h3>
-    <table class="guide-table" style="margin-top:8px">
-      <thead><tr><th>p-value</th><th>Interpretation</th></tr></thead>
-      <tbody>
-        <tr><td><code>&lt; 0.001</code></td><td>Very strong evidence against H₀</td></tr>
-        <tr><td><code>0.001–0.01</code></td><td>Strong evidence</td></tr>
-        <tr><td><code>0.01–0.05</code></td><td>Moderate evidence (reject at α=0.05)</td></tr>
-        <tr><td><code>0.05–0.10</code></td><td>Weak / marginal</td></tr>
-        <tr><td><code>≥ 0.10</code></td><td>Little evidence against H₀</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="card guide-section">
-    <h2> Regression</h2>
-    <p>Fits ordinary-least-squares (OLS) simple linear regression. Outputs slope, intercept, R², RMSE, F-statistic, and p-values for each coefficient. Includes residual vs fitted plot and prediction with intervals.</p>
-  </div>
-  <div class="card guide-section">
-    <h2> Probability Calculator</h2>
-    <p>Compute exact probabilities for any supported distribution:</p>
-    <ul>
-      <li><code>P(X ≤ x)</code> — left-tail probability (CDF)</li>
-      <li><code>P(X ≥ x)</code> — right-tail probability</li>
-      <li><code>P(a ≤ X ≤ b)</code> — interval probability</li>
-      <li><strong>Inverse CDF:</strong> find x such that P(X ≤ x) = p</li>
-    </ul>
-  </div>
-</section>
+  <div class="card"><div class="ct">Observed vs expected</div><div class="ch" style="height:220px"><canvas id="chiChart"></canvas></div></div>
+</div>
 
+<!-- PROBABILITY CALCULATOR -->
+<div class="tp" id="tab-probability">
+  <div class="g2">
+    <div class="card">
+      <div class="ct">Setup</div>
+      <div class="fr"><label>Distribution</label><select id="pd" onchange="initProb()"><option value="normal">Normal</option><option value="exponential">Exponential</option><option value="uniform">Uniform</option><option value="t">Student t</option><option value="binomial">Binomial</option><option value="poisson">Poisson</option></select></div>
+      <div id="pp"></div>
+      <div class="fr"><label>Query</label><select id="pt" onchange="buildPQ()"><option value="leq">P(X &lt;= x)</option><option value="geq">P(X &gt;= x)</option><option value="between">P(a &lt;= X &lt;= b)</option><option value="inv">Inverse CDF</option></select></div>
+      <div id="pq"></div>
+      <button class="btn on" style="margin-top:8px" onclick="calcProb()">Calculate</button>
+      <div id="prob-res"></div>
+    </div>
+    <div class="card"><div class="ct">Distribution curve</div><div class="ch" style="height:260px"><canvas id="probChart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- DATA STORY -->
+<div class="tp" id="tab-story">
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct">Auto-generated insights</div>
+    <button class="btn on" onclick="genStory()">Generate insights</button>
+  </div>
+  <div id="story-out"></div>
+</div>
+
+<!-- GUIDE -->
+<div class="tp" id="tab-guide">
+  <div class="card gs"><h2>Data Analysis Toolkit v2 — User Guide</h2><p>16-module browser-based statistical workbench. No installation. No coding required. All data stays in your browser.</p></div>
+  <div class="g2">
+    <div class="card gs"><h2>Explorer</h2><p>Load any CSV, inspect column types, view missing values, preview rows. Click "Load CSV" in the header to use your own data.</p></div>
+    <div class="card gs"><h2>Data Cleaning</h2><p>Impute missing values (mean/median/mode/zero/forward fill), detect outliers by IQR or Z-score, normalize or standardize columns, filter rows by condition, discretize into bins.</p></div>
+    <div class="card gs"><h2>Descriptive Stats</h2><p>Mean, median, SD, variance, skewness, kurtosis, IQR, CV, SEM, five-number summary, frequency table, histogram. Full multi-column summary table via button.</p></div>
+    <div class="card gs"><h2>Visualizations</h2><p>8 chart types: histogram (adjustable bins), scatter (shows Pearson r live), box plot, bar chart, line chart, correlation matrix (with r labels), bubble chart, area chart.</p></div>
+    <div class="card gs"><h2>Distributions</h2><p>Normal, Exponential, Uniform, Binomial, Poisson, Student t. Live PDF and CDF with parameter sliders. KS goodness-of-fit test with Q-Q plot.</p></div>
+    <div class="card gs"><h2>Statistical Inference</h2><p>Confidence intervals (80-99%), one-sample t-test, two-sample Welch t-test with Cohen's d, normality test (Jarque-Bera + Shapiro-Wilk).</p></div>
+    <div class="card gs"><h2>ANOVA</h2><p>One-way ANOVA with F-table, SS, MS, eta-squared effect size. Tukey HSD post-hoc pairwise comparisons. Group means chart.</p></div>
+    <div class="card gs"><h2>Regression</h2><p>Simple OLS: equation, R-squared, RMSE, coefficient table with p-values, scatter with regression line, residuals vs fitted, prediction interval.</p></div>
+    <div class="card gs"><h2>Multiple Regression</h2><p>Select multiple predictors via checkboxes. Full OLS coefficient table with t-stats, p-values, VIF (multicollinearity check), AIC, BIC, fitted vs actual and residual plots.</p></div>
+    <div class="card gs"><h2>Time Series</h2><p>Moving average, exponential smoothing, linear trend (slope and direction), ACF bar chart, rolling statistics, ADF stationarity approximation.</p></div>
+    <div class="card gs"><h2>Sampling &amp; Power</h2><p>CLT interactive demo, bootstrap CI for mean/median/SD, sample size calculator (mean and proportion), power curves by effect size.</p></div>
+    <div class="card gs"><h2>Chi-Squared</h2><p>Independence test on two categorical columns. Contingency table with observed and expected frequencies. Cramer's V effect size.</p></div>
+    <div class="card gs"><h2>Probability Calculator</h2><p>P(X &lt;= x), P(X &gt;= x), P(a &lt;= X &lt;= b), inverse CDF for all 6 distributions. Chart updates live with parameters.</p></div>
+    <div class="card gs"><h2>Data Story</h2><p>One-click auto-insights: skewness warnings, outlier alerts, correlation flags, missing value report, normality check, distribution summary.</p></div>
+  </div>
+  <div class="card gs">
+    <h2>p-value guide</h2>
+    <ul>
+      <li><code>p &lt; 0.001</code> — very strong evidence against H0</li>
+      <li><code>0.001 - 0.01</code> — strong evidence</li>
+      <li><code>0.01 - 0.05</code> — moderate evidence (reject at alpha=0.05)</li>
+      <li><code>0.05 - 0.10</code> — weak / marginal</li>
+      <li><code>&gt;= 0.10</code> — little evidence against H0</li>
+    </ul>
+  </div>
+</div>
 </main>
-
-<footer>Data Analysis Toolkit · Runs entirely in-browser · No data sent to any server · Built with Chart.js</footer>
-
+<footer>Data Analysis Toolkit v2 &nbsp;|&nbsp; 16 modules &nbsp;|&nbsp; Runs entirely in-browser &nbsp;|&nbsp; No data sent to any server</footer>
 <script>
-// 
-// DATA & STATE
-// 
+const SAMPLE=`id,age,height,weight,score,city,gender,income,year
+1,23,165,60,72,Berlin,F,32000,2021
+2,31,178,82,88,Hamburg,M,47000,2021
+3,27,172,70,65,Munich,M,39000,2022
+4,45,160,55,91,Berlin,F,61000,2022
+5,38,183,90,77,Frankfurt,M,53000,2021
+6,29,169,,84,Hamburg,F,41000,2022
+7,52,175,78,59,Munich,M,70000,2023
+8,34,162,63,93,Berlin,F,45000,2023
+9,41,180,85,,Frankfurt,M,58000,2021
+10,26,158,52,70,Hamburg,F,30000,2022
+11,36,176,79,82,Munich,M,50000,2023
+12,48,167,68,88,Berlin,F,65000,2021
+13,22,171,,61,Frankfurt,M,28000,2022
+14,55,163,58,95,Hamburg,F,72000,2023
+15,30,179,88,76,Munich,M,44000,2021
+16,43,174,76,89,Berlin,F,59000,2022
+17,25,168,65,,Frankfurt,M,33000,2023
+18,39,182,92,71,Hamburg,M,54000,2021
+19,28,161,56,85,Munich,F,38000,2022
+20,47,177,80,78,Berlin,M,67000,2023`;
 
-const SAMPLE_CSV = `id,age,height,weight,score,city,gender,income
-1,23,165,60,72,Berlin,F,32000
-2,31,178,82,88,Hamburg,M,47000
-3,27,172,70,65,Munich,M,39000
-4,45,160,55,91,Berlin,F,61000
-5,38,183,90,77,Frankfurt,M,53000
-6,29,169,,84,Hamburg,F,41000
-7,52,175,78,59,Munich,M,70000
-8,34,162,63,93,Berlin,F,45000
-9,41,180,85,,Frankfurt,M,58000
-10,26,158,52,70,Hamburg,F,30000
-11,36,176,79,82,Munich,M,50000
-12,48,167,68,88,Berlin,F,65000
-13,22,171,,61,Frankfurt,M,28000
-14,55,163,58,95,Hamburg,F,72000
-15,30,179,88,76,Munich,M,44000
-16,43,174,76,89,Berlin,F,59000
-17,25,168,65,,Frankfurt,M,33000
-18,39,182,92,71,Hamburg,M,54000
-19,28,161,56,85,Munich,F,38000
-20,47,177,80,78,Berlin,M,67000`;
+let DS={cols:[],rows:[],num:[],cat:[],meta:{}};
+let CHS={};
+const CLRS=['#388bfd','#3fb950','#bc8cff','#d29922','#f85149','#76e3ea','#f778ba','#79c0ff'];
+const GO={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e',font:{size:10}}}}};
 
-let state = { columns:[], rows:[], numCols:[], catCols:[], meta:{} };
-let charts = {};
+function mkC(id,cfg){if(CHS[id]){CHS[id].destroy();delete CHS[id];}const el=document.getElementById(id);if(!el)return null;CHS[id]=new Chart(el,cfg);return CHS[id];}
 
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
-function mkChart(id, cfg) {
-  destroyChart(id);
-  const c = new Chart(document.getElementById(id), cfg);
-  charts[id] = c; return c;
-}
-
-// 
-// CSV PARSER
-// 
-function parseCSV(text) {
-  const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
-  if (!lines.length) return;
-  const parseLine = line => {
-    const fields=[]; let f='',q=false;
-    for (let i=0;i<line.length;i++) {
-      const c=line[i];
-      if (c==='"') { if(q&&line[i+1]==='"'){f+='"';i++;}else q=!q; }
-      else if (c===','&&!q) { fields.push(f.trim());f=''; }
-      else f+=c;
-    }
-    fields.push(f.trim()); return fields;
-  };
-  const coerce = v => {
-    if (!v||v==='NA'||v==='N/A'||v==='null'||v==='NULL'||v==='?'||v==='') return null;
-    const n=Number(v); return isNaN(n)?v:n;
-  };
-  const cols = parseLine(lines[0]);
-  const rows = lines.slice(1).map((l,idx)=>{
-    const f=parseLine(l), row={_i:idx+2};
-    cols.forEach((c,i)=>{ row[c]=coerce(f[i]??''); });
-    return row;
-  });
-  const numCols=[], catCols=[];
-  cols.forEach(c => {
-    const vals=rows.map(r=>r[c]).filter(v=>v!==null);
-    const nums=vals.filter(v=>typeof v==='number');
-    (nums.length/Math.max(vals.length,1)>=0.7?numCols:catCols).push(c);
-  });
-  const meta = { rowCount:rows.length, colCount:cols.length };
-  meta.totalMissing = rows.reduce((a,r)=>a+cols.filter(c=>r[c]===null).length,0);
+// CSV parser
+function parseCSV(txt){
+  const lines=txt.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
+  if(!lines.length)return;
+  const pl=l=>{const f=[];let s='',q=false;for(let i=0;i<l.length;i++){const c=l[i];if(c==='"'){if(q&&l[i+1]==='"'){s+='"';i++;}else q=!q;}else if(c===','&&!q){f.push(s.trim());s='';}else s+=c;}f.push(s.trim());return f;};
+  const cv=v=>{if(!v||['NA','N/A','null','NULL','?',''].includes(v))return null;const n=Number(v);return isNaN(n)?v:n;};
+  const cols=pl(lines[0]);
+  const rows=lines.slice(1).map((l,i)=>{const f=pl(l),r={_i:i+2};cols.forEach((c,j)=>r[c]=cv(f[j]??''));return r;});
+  const num=[],cat=[];
+  cols.forEach(c=>{const vs=rows.map(r=>r[c]).filter(v=>v!==null);const ns=vs.filter(v=>typeof v==='number');(ns.length/Math.max(vs.length,1)>=0.7?num:cat).push(c);});
+  const meta={rowCount:rows.length,colCount:cols.length};
+  meta.totalMissing=rows.reduce((a,r)=>a+cols.filter(c=>r[c]===null).length,0);
   meta.cols={};
-  cols.forEach(c=>{
-    const vals=rows.map(r=>r[c]);
-    const miss=vals.filter(v=>v===null).length;
-    const uniq=new Set(vals.filter(v=>v!==null)).size;
-    const isNum=numCols.includes(c);
-    meta.cols[c]={type:isNum?'numeric':'categorical',missing:miss,missingPct:+(miss/vals.length*100).toFixed(1),unique:uniq};
-  });
-  state={columns:cols,rows,numCols,catCols,meta};
+  cols.forEach(c=>{const vs=rows.map(r=>r[c]),miss=vs.filter(v=>v===null).length,uniq=new Set(vs.filter(v=>v!==null)).size;meta.cols[c]={type:num.includes(c)?'numeric':'categorical',missing:miss,missingPct:+(miss/vs.length*100).toFixed(1),unique:uniq};});
+  DS={cols,rows,num,cat,meta};
 }
 
-// 
-// STATS ENGINE
-// 
-const clean = arr => arr.filter(v=>v!==null&&v!==undefined&&!isNaN(v));
-const smean = arr => { const v=clean(arr); return v.length?v.reduce((a,b)=>a+b,0)/v.length:NaN; };
-const smedian = arr => {
-  const v=[...clean(arr)].sort((a,b)=>a-b);
-  if(!v.length) return NaN;
-  const m=Math.floor(v.length/2);
-  return v.length%2===0?(v[m-1]+v[m])/2:v[m];
-};
-const svar = arr => {
-  const v=clean(arr); if(v.length<2) return NaN;
-  const m=smean(v); return v.reduce((a,x)=>a+(x-m)**2,0)/(v.length-1);
-};
-const sstd = arr => Math.sqrt(svar(arr));
-const sperc = (arr,p) => {
-  const v=[...clean(arr)].sort((a,b)=>a-b);
-  const i=(p/100)*(v.length-1),lo=Math.floor(i),hi=Math.ceil(i);
-  return v[lo]+(v[hi]-v[lo])*(i-lo);
-};
-const sskew = arr => {
-  const v=clean(arr); if(v.length<3) return NaN;
-  const m=smean(v),s=sstd(v),n=v.length;
-  return (v.reduce((a,x)=>a+((x-m)/s)**3,0)*n)/((n-1)*(n-2));
-};
-const skurt = arr => {
-  const v=clean(arr); if(v.length<4) return NaN;
-  const m=smean(v),s=sstd(v),n=v.length;
-  const k4=v.reduce((a,x)=>a+((x-m)/s)**4,0);
-  return ((n*(n+1))/((n-1)*(n-2)*(n-3)))*k4-(3*(n-1)**2)/((n-2)*(n-3));
-};
-const describe = arr => {
-  const v=clean(arr),n=v.length;
-  const m=smean(v),s=sstd(v);
-  return {n,missing:arr.length-n,mean:m,median:smedian(v),sd:s,variance:svar(v),
-    min:Math.min(...v),max:Math.max(...v),q1:sperc(v,25),q3:sperc(v,75),
-    iqr:sperc(v,75)-sperc(v,25),skew:sskew(v),kurt:skurt(v),
-    cv:s/m*100,sem:s/Math.sqrt(n)};
+// Stats
+const cl=a=>a.filter(v=>v!==null&&v!==undefined&&!isNaN(Number(v))).map(Number);
+const sm=a=>{const v=cl(a);return v.length?v.reduce((a,b)=>a+b,0)/v.length:NaN;};
+const smd=a=>{const v=[...cl(a)].sort((a,b)=>a-b);if(!v.length)return NaN;const m=Math.floor(v.length/2);return v.length%2?v[m]:(v[m-1]+v[m])/2;};
+const sv=a=>{const v=cl(a);if(v.length<2)return NaN;const m=sm(v);return v.reduce((a,x)=>a+(x-m)**2,0)/(v.length-1);};
+const ss=a=>Math.sqrt(sv(a));
+const sp=(a,p)=>{const v=[...cl(a)].sort((a,b)=>a-b);if(!v.length)return NaN;const i=(p/100)*(v.length-1),lo=Math.floor(i),hi=Math.ceil(i);return v[lo]+(v[hi]-v[lo])*(i-lo);};
+const sk=a=>{const v=cl(a);if(v.length<3)return NaN;const m=sm(v),s=ss(v),n=v.length;return(v.reduce((a,x)=>a+((x-m)/s)**3,0)*n)/((n-1)*(n-2));};
+const ku=a=>{const v=cl(a);if(v.length<4)return NaN;const m=sm(v),s=ss(v),n=v.length;const k4=v.reduce((a,x)=>a+((x-m)/s)**4,0);return((n*(n+1))/((n-1)*(n-2)*(n-3)))*k4-(3*(n-1)**2)/((n-2)*(n-3));};
+const desc=a=>{const v=cl(a),n=v.length,m=sm(v),s=ss(v);return{n,miss:a.length-n,mean:m,med:smd(v),sd:s,var:sv(v),min:Math.min(...v),max:Math.max(...v),q1:sp(v,25),q3:sp(v,75),iqr:sp(v,75)-sp(v,25),skew:sk(v),kurt:ku(v),cv:s/m*100,sem:s/Math.sqrt(n)};};
+const ncdf=z=>{const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;const s=z<0?-1:1,x=Math.abs(z),t=1/(1+p*x);return 0.5*(1+s*(1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)));};
+const npdf=(x,m=0,s=1)=>Math.exp(-0.5*((x-m)/s)**2)/(s*Math.sqrt(2*Math.PI));
+const ninv=p=>{if(p<=0)return -Infinity;if(p>=1)return Infinity;const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239],b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1],c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];const pL=0.02425,pH=1-pL;let q,r;if(p<pL){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}if(p<=pH){q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+1);}q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);};
+const tc=(alpha,df)=>{const t=[12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,2.042];if(df<=30)return t[Math.min(df-1,29)];if(df<=60)return 2.000;if(df<=120)return 1.980;return 1.960;};
+const pr=(x,y)=>{const n=Math.min(x.length,y.length),mx=sm(x.slice(0,n)),my=sm(y.slice(0,n));let num=0,dx2=0,dy2=0;for(let i=0;i<n;i++){const dx=x[i]-mx,dy=y[i]-my;num+=dx*dy;dx2+=dx*dx;dy2+=dy*dy;}return num/Math.sqrt(dx2*dy2);};
+const lgam=z=>{const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];let y=z,t=z+5.5;t-=(z+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++){y++;s+=c[j]/y;}return -t+Math.log(2.5066282746310005*s/z);};
+const betaI=(x,a,b)=>{if(x<=0)return 0;if(x>=1)return 1;let s=0,t=1;for(let i=0;i<200;i++){t*=(a+i)*x/(a+b+i)/(i+1);s+=t;if(Math.abs(t)<1e-9)break;}return Math.pow(x,a)*Math.pow(1-x,b)*s;};
+const fCDF=(x,d1,d2)=>{const z=(d1*x)/(d1*x+d2);return betaI(z,d1/2,d2/2);};
+const chiSqCDF=(x,df)=>{if(x<=0)return 0;let sum=1/df,term=1/df;for(let k=1;k<200;k++){term*=x/(df/2+k);sum+=term;if(Math.abs(term)<1e-10)break;}return Math.min(1,sum*Math.exp(-x/2+(df/2)*Math.log(x/2))*Math.exp(-lgam(df/2)));};
+
+// Distribution engine
+const DIST={
+  normal:{pdf:(x,p)=>npdf(x,p.mu,p.sigma),cdf:(x,p)=>ncdf((x-p.mu)/p.sigma),inv:(q,p)=>p.mu+p.sigma*ninv(q),range:p=>[p.mu-4*p.sigma,p.mu+4*p.sigma],params:{mu:0,sigma:1},lbls:{mu:'Mean (mu)',sigma:'Std dev (sigma)'},sl:{mu:{min:-10,max:10,step:0.5},sigma:{min:0.2,max:5,step:0.2}},stats:p=>({mean:p.mu,var:p.sigma**2,skew:0,kurt:0})},
+  exponential:{pdf:(x,p)=>x<0?0:p.lambda*Math.exp(-p.lambda*x),cdf:(x,p)=>x<0?0:1-Math.exp(-p.lambda*x),inv:(q,p)=>-Math.log(1-q)/p.lambda,range:p=>[0,5/p.lambda],params:{lambda:1},lbls:{lambda:'Rate (lambda)'},sl:{lambda:{min:0.1,max:4,step:0.1}},stats:p=>({mean:1/p.lambda,var:1/p.lambda**2,skew:2,kurt:6})},
+  uniform:{pdf:(x,p)=>(x>=p.a&&x<=p.b)?1/(p.b-p.a):0,cdf:(x,p)=>x<p.a?0:x>p.b?1:(x-p.a)/(p.b-p.a),inv:(q,p)=>p.a+q*(p.b-p.a),range:p=>[p.a-0.5,p.b+0.5],params:{a:0,b:5},lbls:{a:'Min (a)',b:'Max (b)'},sl:{a:{min:-5,max:4,step:0.5},b:{min:1,max:10,step:0.5}},stats:p=>({mean:(p.a+p.b)/2,var:(p.b-p.a)**2/12,skew:0,kurt:-1.2})},
+  t:{pdf:(x,p)=>{const lc=lgam((p.df+1)/2)-lgam(p.df/2)-0.5*Math.log(p.df*Math.PI);return Math.exp(lc-(p.df+1)/2*Math.log(1+x*x/p.df));},cdf:(x,p)=>p.df>=30?ncdf(x):(()=>{const A=(p.df-.5)/p.df,B=48*A*A,z2=x*x/p.df,z=A*Math.log(1+z2),y=Math.sqrt(z*B);return x<0?1-ncdf(y):ncdf(y);})(),inv:(q,p)=>{let lo=-20,hi=20;for(let i=0;i<100;i++){const m=(lo+hi)/2;if(DIST.t.cdf(m,p)<q)lo=m;else hi=m;}return(lo+hi)/2;},range:_=>[ninv(0.001),ninv(0.999)],params:{df:10},lbls:{df:'Degrees of freedom'},sl:{df:{min:1,max:50,step:1}},stats:p=>({mean:0,var:p.df>2?p.df/(p.df-2):Infinity,skew:0,kurt:p.df>4?6/(p.df-4):Infinity})},
+  binomial:{pdf:(x,p)=>{if(!Number.isInteger(x)||x<0||x>p.n)return 0;return Math.exp(lgam(p.n+1)-lgam(x+1)-lgam(p.n-x+1)+x*Math.log(p.p)+(p.n-x)*Math.log(1-p.p));},cdf:(x,p)=>{let s=0;for(let k=0;k<=Math.floor(x);k++)s+=DIST.binomial.pdf(k,p);return s;},inv:(q,p)=>{let s=0;for(let k=0;k<=p.n;k++){s+=DIST.binomial.pdf(k,p);if(s>=q)return k;}return p.n;},range:p=>[0,p.n],params:{n:10,p:0.5},lbls:{n:'Trials (n)',p:'Prob (p)'},sl:{n:{min:1,max:30,step:1},p:{min:0.01,max:0.99,step:0.01}},discrete:true,stats:p=>({mean:p.n*p.p,var:p.n*p.p*(1-p.p),skew:(1-2*p.p)/Math.sqrt(p.n*p.p*(1-p.p)),kurt:(1-6*p.p*(1-p.p))/(p.n*p.p*(1-p.p))})},
+  poisson:{pdf:(x,p)=>{if(!Number.isInteger(x)||x<0)return 0;let f=1;for(let i=2;i<=x;i++)f*=i;return Math.exp(-p.lambda)*p.lambda**x/f;},cdf:(x,p)=>{let s=0;for(let k=0;k<=Math.floor(x);k++)s+=DIST.poisson.pdf(k,p);return s;},inv:(q,p)=>{let s=0;for(let k=0;k<100;k++){s+=DIST.poisson.pdf(k,p);if(s>=q)return k;}return 99;},range:p=>[0,Math.ceil(p.lambda+4*Math.sqrt(p.lambda))],params:{lambda:3},lbls:{lambda:'Rate (lambda)'},discrete:true,stats:p=>({mean:p.lambda,var:p.lambda,skew:1/Math.sqrt(p.lambda),kurt:1/p.lambda})},
 };
 
-// Normal distribution
-const normCDF = z => {
-  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
-  const s=z<0?-1:1,x=Math.abs(z),t=1/(1+p*x);
-  return 0.5*(1+s*(1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)));
-};
-const normPDF = (x,mu=0,sigma=1) => Math.exp(-0.5*((x-mu)/sigma)**2)/(sigma*Math.sqrt(2*Math.PI));
-const normInv = p => {
-  if(p<=0) return -Infinity; if(p>=1) return Infinity;
-  const a=[-3.969683028665376e1,2.209460984245205e2,-2.759285104469687e2,1.383577518672690e2,-3.066479806614716e1,2.506628277459239];
-  const b=[-5.447609879822406e1,1.615858368580409e2,-1.556989798598866e2,6.680131188771972e1,-1.328068155288572e1];
-  const c=[-7.784894002430293e-3,-3.223964580411365e-1,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783];
-  const d=[7.784695709041462e-3,3.224671290700398e-1,2.445134137142996,3.754408661907416];
-  const pLow=0.02425,pHigh=1-pLow;
-  let q,r;
-  if(p<pLow){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
-  else if(p<=pHigh){q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+1);}
-  else{q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
-};
-const tCrit = (alpha,df) => {
-  const t=[12.706,4.303,3.182,2.776,2.571,2.447,2.365,2.306,2.262,2.228,2.201,2.179,2.160,2.145,2.131,2.120,2.110,2.101,2.093,2.086,2.080,2.074,2.069,2.064,2.060,2.056,2.052,2.048,2.045,2.042];
-  if(df<=30) return t[Math.min(df-1,29)];
-  if(df<=60) return 2.000; if(df<=120) return 1.980; return 1.960;
-};
-const pearsonR = (x,y) => {
-  const n=Math.min(x.length,y.length),mx=smean(x.slice(0,n)),my=smean(y.slice(0,n));
-  let num=0,dx2=0,dy2=0;
-  for(let i=0;i<n;i++){const dx=x[i]-mx,dy=y[i]-my;num+=dx*dy;dx2+=dx*dx;dy2+=dy*dy;}
-  return num/Math.sqrt(dx2*dy2);
-};
+// NAV
+function switchTab(id){document.querySelectorAll('.nt').forEach(b=>b.classList.toggle('on',b.dataset.tab===id));document.querySelectorAll('.tp').forEach(p=>p.classList.toggle('on',p.id==='tab-'+id));({explorer:renderExplorer,clean:renderClean,stats:()=>renderStats(),viz:()=>renderViz(),dist:()=>renderDist(),inference:()=>renderInf(),anova:renderAnova,regression:renderReg,multiReg:renderMR,timeseries:renderTS,sampling:renderSampling,chi:renderChi,probability:renderProb,story:genStory})[id]?.();}
+document.querySelectorAll('.nt').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 
-// Distribution functions
-const DIST = {
-  normal: {
-    pdf:(x,p)=>normPDF(x,p.mu,p.sigma),
-    cdf:(x,p)=>normCDF((x-p.mu)/p.sigma),
-    inv:(prob,p)=>p.mu+p.sigma*normInv(prob),
-    range:p=>[p.mu-4*p.sigma,p.mu+4*p.sigma],
-    stats:p=>({mean:p.mu,variance:p.sigma**2,skew:0,kurt:0}),
-    params:{mu:0,sigma:1},labels:{mu:'Mean (μ)',sigma:'Std dev (σ)'},
-    sliders:{mu:{min:-10,max:10,step:0.5},sigma:{min:0.2,max:5,step:0.2}},
-  },
-  exponential:{
-    pdf:(x,p)=>x<0?0:p.lambda*Math.exp(-p.lambda*x),
-    cdf:(x,p)=>x<0?0:1-Math.exp(-p.lambda*x),
-    inv:(prob,p)=>-Math.log(1-prob)/p.lambda,
-    range:p=>[0,5/p.lambda],
-    stats:p=>({mean:1/p.lambda,variance:1/p.lambda**2,skew:2,kurt:6}),
-    params:{lambda:1},labels:{lambda:'Rate (λ)'},
-    sliders:{lambda:{min:0.1,max:4,step:0.1}},
-  },
-  uniform:{
-    pdf:(x,p)=>(x>=p.a&&x<=p.b)?1/(p.b-p.a):0,
-    cdf:(x,p)=>x<p.a?0:x>p.b?1:(x-p.a)/(p.b-p.a),
-    inv:(prob,p)=>p.a+prob*(p.b-p.a),
-    range:p=>[p.a-0.5,p.b+0.5],
-    stats:p=>({mean:(p.a+p.b)/2,variance:(p.b-p.a)**2/12,skew:0,kurt:-6/5}),
-    params:{a:0,b:5},labels:{a:'Min (a)',b:'Max (b)'},
-    sliders:{a:{min:-5,max:4,step:0.5},b:{min:1,max:10,step:0.5}},
-  },
-  binomial:{
-    pdf:(x,p)=>{
-      if(!Number.isInteger(x)||x<0||x>p.n) return 0;
-      const lgamma=z=>{const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];let y=z,tmp=z+5.5;tmp-=(z+0.5)*Math.log(tmp);let s=1.000000000190015;for(let j=0;j<6;j++){y++;s+=c[j]/y;}return -tmp+Math.log(2.5066282746310005*s/z);};
-      return Math.exp(lgamma(p.n+1)-lgamma(x+1)-lgamma(p.n-x+1)+x*Math.log(p.p)+(p.n-x)*Math.log(1-p.p));
-    },
-    cdf:(x,p)=>{let s=0;for(let k=0;k<=Math.floor(x);k++)s+=DIST.binomial.pdf(k,p);return s;},
-    inv:(prob,p)=>{let s=0;for(let k=0;k<=p.n;k++){s+=DIST.binomial.pdf(k,p);if(s>=prob)return k;}return p.n;},
-    range:p=>[0,p.n],
-    stats:p=>({mean:p.n*p.p,variance:p.n*p.p*(1-p.p),skew:(1-2*p.p)/Math.sqrt(p.n*p.p*(1-p.p)),kurt:(1-6*p.p*(1-p.p))/(p.n*p.p*(1-p.p))}),
-    params:{n:10,p:0.5},labels:{n:'Trials (n)',p:'Prob (p)'},
-    sliders:{n:{min:1,max:30,step:1},p:{min:0.01,max:0.99,step:0.01}},
-    discrete:true,
-  },
-  poisson:{
-    pdf:(x,p)=>{if(!Number.isInteger(x)||x<0)return 0;let f=1;for(let i=2;i<=x;i++)f*=i;return Math.exp(-p.lambda)*p.lambda**x/f;},
-    cdf:(x,p)=>{let s=0;for(let k=0;k<=Math.floor(x);k++)s+=DIST.poisson.pdf(k,p);return s;},
-    inv:(prob,p)=>{let s=0;for(let k=0;k<100;k++){s+=DIST.poisson.pdf(k,p);if(s>=prob)return k;}return 99;},
-    range:p=>[0,Math.ceil(p.lambda+4*Math.sqrt(p.lambda))],
-    stats:p=>({mean:p.lambda,variance:p.lambda,skew:1/Math.sqrt(p.lambda),kurt:1/p.lambda}),
-    params:{lambda:3},labels:{lambda:'Rate (λ)'},
-    sliders:{lambda:{min:0.5,max:15,step:0.5}},
-    discrete:true,
-  },
-  t:{
-    pdf:(x,p)=>{
-      const lgamma=z=>{const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];let y=z,tmp=z+5.5;tmp-=(z+0.5)*Math.log(tmp);let s=1.000000000190015;for(let j=0;j<6;j++){y++;s+=c[j]/y;}return -tmp+Math.log(2.5066282746310005*s/z);};
-      return Math.exp(lgamma((p.df+1)/2)-lgamma(p.df/2)-0.5*Math.log(p.df*Math.PI)-(p.df+1)/2*Math.log(1+x*x/p.df));
-    },
-    cdf:(x,p)=>p.df>=30?normCDF(x):(()=>{const A=(p.df-0.5)/p.df,B=48*A*A,z2=x*x/p.df,z=A*Math.log(1+z2),y=Math.sqrt(z*B);return x<0?1-normCDF(y):normCDF(y);})(),
-    inv:(prob,p)=>{let lo=-20,hi=20;for(let i=0;i<100;i++){const mid=(lo+hi)/2;if(DIST.t.cdf(mid,p)<prob)lo=mid;else hi=mid;}return(lo+hi)/2;},
-    range:p=>[normInv(0.001),normInv(0.999)],
-    stats:p=>({mean:0,variance:p.df>2?p.df/(p.df-2):Infinity,skew:0,kurt:p.df>4?6/(p.df-4):Infinity}),
-    params:{df:10},labels:{df:'Degrees of freedom'},
-    sliders:{df:{min:1,max:50,step:1}},
-  },
-};
+// FILE
+document.getElementById('fi').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{parseCSV(ev.target.result);fillSelects();switchTab('explorer');};r.readAsText(f);});
+function exportCSV(){const h=DS.cols.join(','),b=DS.rows.map(r=>DS.cols.map(c=>r[c]===null?'':r[c]).join(','));const blob=new Blob([[h,...b].join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='toolkit_export.csv';a.click();}
 
-// 
-// NAVIGATION
-// 
-document.querySelectorAll('.nav-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
-    renderTab(btn.dataset.tab);
-  });
-});
-
-function renderTab(tab) {
-  const fns = {
-    explorer: renderExplorer,
-    stats: ()=>renderStats(),
-    viz: ()=>renderViz(),
-    dist: ()=>renderDist(),
-    inference: ()=>renderInference(),
-    regression: ()=>renderRegression(),
-    probability: ()=>renderProbability(),
-  };
-  if (fns[tab]) fns[tab]();
+// SELECTS
+function fill(id,opts){const el=document.getElementById(id);if(!el)return;el.innerHTML=opts.map(o=>`<option value="${o}">${o}</option>`).join('');}
+function fillSelects(){
+  const n=DS.num,c=DS.cat;
+  ['st-col','ci-col','tt-col','tt2-col','gof-col','rx','clt-col','boot-col','ts-col','nm-col','out-col','cl-col','bn-col','fl-col','av-col','mr-y'].forEach(id=>fill(id,n));
+  ['tt2-grp','av-grp','chi-row','chi-col2'].forEach(id=>fill(id,[...c,...n.filter(c=>new Set(DS.rows.map(r=>r[c])).size<=8)]));
+  fill('ry',n.length>1?n.slice(1):n);
+  const mc=document.getElementById('mr-x-checks');if(mc)mc.innerHTML=n.map(col=>`<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" value="${col}" style="accent-color:var(--bl)"> ${col}</label>`).join('');
 }
 
-// 
-// FILE LOADING
-// 
-document.getElementById('file-input').addEventListener('change', e => {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    parseCSV(ev.target.result);
-    populateAllSelects();
-    renderExplorer();
-    document.querySelector('.nav-tab[data-tab=explorer]').click();
-  };
-  reader.readAsText(file);
-});
-
-function exportCSV() {
-  const header = state.columns.join(',');
-  const body = state.rows.map(r => state.columns.map(c => r[c]===null?'':r[c]).join(','));
-  const blob = new Blob([[header,...body].join('\n')],{type:'text/csv'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download='toolkit_export.csv'; a.click();
-}
-
-// 
-// POPULATE SELECTS
-// 
-function fillSelect(id, options) {
-  const el = document.getElementById(id); if (!el) return;
-  el.innerHTML = options.map(o=>`<option value="${o}">${o}</option>`).join('');
-}
-function populateAllSelects() {
-  const nc = state.numCols, cc = state.catCols, all = state.columns;
-  fillSelect('stats-col', nc);
-  fillSelect('ci-col', nc);
-  fillSelect('ttest-col', nc);
-  fillSelect('ttest2-col', nc);
-  fillSelect('ttest2-group', [...cc,...nc.filter(c=>new Set(state.rows.map(r=>r[c])).size<=6)]);
-  fillSelect('norm-col', nc);
-  fillSelect('gof-col', nc);
-  fillSelect('reg-x', nc);
-  fillSelect('reg-y', nc.length>1?nc.slice(1):nc);
-}
-
-// 
 // EXPLORER
-// 
-function renderExplorer() {
-  const {columns,rows,numCols,catCols,meta} = state;
-  // Metrics
-  document.getElementById('explorer-metrics').innerHTML = `
-    <div class="metric"><div class="metric-label">Rows</div><div class="metric-val c-blue">${meta.rowCount}</div></div>
-    <div class="metric"><div class="metric-label">Columns</div><div class="metric-val c-green">${meta.colCount}</div></div>
-    <div class="metric"><div class="metric-label">Missing</div><div class="metric-val c-red">${meta.totalMissing}</div></div>
-    <div class="metric"><div class="metric-label">Numeric</div><div class="metric-val c-purple">${numCols.length}</div></div>
-    <div class="metric"><div class="metric-label">Categorical</div><div class="metric-val c-amber">${catCols.length}</div></div>
-  `;
-  // Missing bars
-  const mb = document.getElementById('missing-bars');
-  mb.innerHTML = columns.map(c => {
-    const m = meta.cols[c];
-    return `<div class="miss-item">
-      <div class="miss-header"><span class="miss-col">${c}</span><span class="miss-count">${m.missing} (${m.missingPct}%)</span></div>
-      <div class="bar-wrap"><div class="bar-fill ${m.missing>0?'bar-red':'bar-green'}" style="width:${Math.max(m.missingPct,0.5)}%"></div></div>
-    </div>`;
-  }).join('');
-  // Schema
-  const tbody = document.querySelector('#schema-table tbody');
-  tbody.innerHTML = columns.map(c => {
-    const m = meta.cols[c];
-    return `<tr><td>${c}</td>
-      <td><span class="badge ${m.type==='numeric'?'badge-blue':'badge-purple'}">${m.type}</span></td>
-      <td class="mono">${m.unique}</td>
-      <td><span class="badge ${m.missing>0?'badge-red':'badge-green'}">${m.missing}</span></td>
-    </tr>`;
-  }).join('');
-  // Preview
-  const wrap = document.getElementById('preview-wrap');
-  const disp = rows.slice(0,10);
-  const th = columns.map(c=>`<th>${c}</th>`).join('');
-  const trs = disp.map(row => {
-    const tds = columns.map(c => {
-      const v = row[c];
-      return `<td>${v===null?'<span class="badge badge-null">null</span>':v}</td>`;
-    }).join('');
-    return `<tr>${tds}</tr>`;
-  }).join('');
-  wrap.innerHTML = `<table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
+function renderExplorer(){
+  const{cols,rows,num,cat,meta}=DS;
+  document.getElementById('ex-m').innerHTML=`<div class="mc"><div class="ml">Rows</div><div class="mv cb">${meta.rowCount}</div></div><div class="mc"><div class="ml">Columns</div><div class="mv cg">${meta.colCount}</div></div><div class="mc"><div class="ml">Missing</div><div class="mv cr">${meta.totalMissing}</div></div><div class="mc"><div class="ml">Numeric</div><div class="mv cp">${num.length}</div></div><div class="mc"><div class="ml">Categorical</div><div class="mv ca">${cat.length}</div></div><div class="mc"><div class="ml">Completeness</div><div class="mv cc">${(100-meta.totalMissing/(meta.rowCount*meta.colCount)*100).toFixed(0)}%</div></div>`;
+  document.getElementById('ex-miss').innerHTML=cols.map(c=>{const m=meta.cols[c];return`<div class="mi"><div class="mh"><span style="color:var(--tx2)">${c}</span><span style="font-family:var(--mo)">${m.missing}(${m.missingPct}%)</span></div><div class="bw"><div class="bf" style="width:${Math.max(m.missingPct,.3)}%;background:${m.missing>0?'var(--rd)':'var(--gn)'}"></div></div></div>`;}).join('');
+  document.querySelector('#ex-schema tbody').innerHTML=cols.map(c=>{const m=meta.cols[c];return`<tr><td>${c}</td><td><span class="bd ${m.type==='numeric'?'bb':'bp'}">${m.type}</span></td><td class="mo">${m.unique}</td><td><span class="bd ${m.missing>0?'br':'bg'}">${m.missing}</span></td></tr>`;}).join('');
+  const th=cols.map(c=>`<th>${c}</th>`).join('');
+  const trs=DS.rows.slice(0,12).map(r=>`<tr>${cols.map(c=>`<td>${r[c]===null?'<span class="bd bn">null</span>':r[c]}</td>`).join('')}</tr>`).join('');
+  document.getElementById('ex-prev').innerHTML=`<table><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
 }
 
-// 
-// DESCRIPTIVE STATS
-// 
-function renderStats() {
-  const colSel = document.getElementById('stats-col');
-  if (!colSel) return;
-  colSel.addEventListener('change', drawStats);
-  populateAllSelects();
-  drawStats();
-}
+// CLEANING
+function renderClean(){fillSelects();}
+function doImpute(){const col=document.getElementById('cl-col').value,strat=document.getElementById('cl-strat').value;const vals=DS.rows.map(r=>r[col]),before=vals.filter(v=>v===null).length;const v=cl(vals),m=strat==='mean'?sm(v):strat==='median'?smd(v):strat==='zero'?0:null;let filled=0;DS.rows.forEach((r,i)=>{if(r[col]===null&&m!==null){r[col]=+m.toFixed(4);filled++;}});document.getElementById('cl-res').innerHTML=`<div class="res ok"><div class="rt2">Done</div><div class="kv"><span class="kk">Filled</span><span class="kval">${filled}</span></div><div class="kv"><span class="kk">Strategy</span><span class="kval">${strat}</span></div>${m!==null?`<div class="kv"><span class="kk">Fill value</span><span class="kval">${m.toFixed(4)}</span></div>`:''}</div>`;}
+function detectOut(){const col=document.getElementById('out-col').value,meth=document.getElementById('out-meth').value;const v=cl(DS.rows.map(r=>r[col])),q1=sp(v,25),q3=sp(v,75),iqrv=q3-q1;let lo,hi,outs;if(meth.startsWith('iqr')){const k=meth==='iqr3'?3:1.5;lo=q1-k*iqrv;hi=q3+k*iqrv;outs=v.filter(x=>x<lo||x>hi);}else{const m=sm(v),s=ss(v);outs=v.filter(x=>Math.abs((x-m)/s)>3);}document.getElementById('out-res').innerHTML=`<div class="res ${outs.length>0?'wa':'ok'}"><div class="rt2">Outliers in ${col}</div><div class="kv"><span class="kk">Found</span><span class="kval" style="color:${outs.length>0?'var(--am)':'var(--gn)'}">${outs.length}</span></div>${meth.startsWith('iqr')?`<div class="kv"><span class="kk">Fences</span><span class="kval">[${lo.toFixed(2)}, ${hi.toFixed(2)}]</span></div>`:''}<div class="kv"><span class="kk">Values</span><span class="kval" style="font-size:10px">${outs.slice(0,6).join(', ')}${outs.length>6?'...':''}</span></div></div>`;}
+function doNorm(){const col=document.getElementById('nm-col').value,meth=document.getElementById('nm-meth').value;const v=cl(DS.rows.map(r=>r[col]));const mn=Math.min(...v),mx=Math.max(...v),m=sm(v),s=ss(v);let t;if(meth==='minmax')t=v.map(x=>(x-mn)/(mx-mn));else if(meth==='zscore')t=v.map(x=>(x-m)/s);else t=v.filter(x=>x>0).map(x=>Math.log(x));document.getElementById('nm-res').innerHTML=`<div class="res ok"><div class="kv"><span class="kk">New mean</span><span class="kval">${sm(t).toFixed(4)}</span></div><div class="kv"><span class="kk">New std</span><span class="kval">${ss(t).toFixed(4)}</span></div></div>`;mkC('nmChart',{type:'bar',data:{labels:['Original','Transformed'],datasets:[{data:[sm(v),sm(t)],backgroundColor:['rgba(56,139,253,.6)','rgba(63,185,80,.6)'],borderRadius:4}]},options:{...GO,plugins:{legend:{display:false}}}});}
+function doFilter(){const col=document.getElementById('fl-col').value,op=document.getElementById('fl-op').value,val=parseFloat(document.getElementById('fl-val').value);if(isNaN(val))return;const ops={'>':x=>x>val,'<':x=>x<val,'>=':x=>x>=val,'<=':x=>x<=val,'==':x=>x==val};const f=DS.rows.filter(r=>r[col]!==null&&ops[op](r[col]));document.getElementById('fl-res').innerHTML=`<div class="res ok"><div class="kv"><span class="kk">Rows matching ${col} ${op} ${val}</span><span class="kval">${f.length} / ${DS.rows.length}</span></div></div>`;}
+function doBin(){const col=document.getElementById('bn-col').value,n=parseInt(document.getElementById('bn-n').value),meth=document.getElementById('bn-m').value;const v=cl(DS.rows.map(r=>r[col])),mn=Math.min(...v),mx=Math.max(...v),bw=(mx-mn)/n;const freq={};v.forEach(x=>{const i=Math.min(Math.floor((x-mn)/bw),n-1);const lbl=`${(mn+i*bw).toFixed(1)}-${(mn+(i+1)*bw).toFixed(1)}`;freq[lbl]=(freq[lbl]||0)+1;});document.getElementById('bn-res').innerHTML=`<table><thead><tr><th>Bin</th><th>Count</th><th>%</th></tr></thead><tbody>${Object.entries(freq).map(([b,c])=>`<tr><td class="mo">${b}</td><td>${c}</td><td>${(c/v.length*100).toFixed(1)}%</td></tr>`).join('')}</tbody></table>`;}
 
-function drawStats() {
-  const col = document.getElementById('stats-col').value; if (!col) return;
-  const vals = state.rows.map(r=>r[col]);
-  const d = describe(vals);
-  document.getElementById('stats-col-name').textContent = col;
-  const fmt = v => isNaN(v)||v===undefined?'—':typeof v==='number'?v.toFixed(4):v;
-  const leftKeys=[['Count (n)','n'],['Mean','mean'],['Median','median'],['Std Dev (s)','sd'],['Variance (s²)','variance'],['Skewness','skew'],['Kurtosis','kurt']];
-  const rightKeys=[['Min','min'],['Q1 (25%)','q1'],['Q3 (75%)','q3'],['Max','max'],['IQR','iqr'],['CV (%)','cv'],['SEM','sem']];
-  const kvHtml = keys => keys.map(([l,k])=>`<div class="kv-row"><span class="kv-key">${l}</span><span class="kv-val">${fmt(d[k])}</span></div>`).join('');
-  document.getElementById('stats-kv-left').innerHTML = kvHtml(leftKeys);
-  document.getElementById('stats-kv-right').innerHTML = kvHtml(rightKeys);
-  // Five-number summary bar
-  const [mn,q1,med,q3,mx]=[d.min,d.q1,d.median,d.q3,d.max];
-  const pct = v => ((v-mn)/(mx-mn)*100).toFixed(1);
-  document.getElementById('five-num').innerHTML = `
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px">
-      <span>Min</span><span>Q1</span><span>Median</span><span>Q3</span><span>Max</span>
-    </div>
-    <div style="position:relative;height:20px;background:var(--bg3);border-radius:4px">
-      <div style="position:absolute;left:${pct(q1)}%;width:${pct(q3)-pct(q1)}%;height:100%;background:rgba(56,139,253,.3);border-radius:3px"></div>
-      <div style="position:absolute;left:${pct(med)}%;width:3px;height:100%;background:var(--blue);transform:translateX(-50%)"></div>
-    </div>
-    <div style="display:flex;justify-content:space-between;font-size:12px;font-family:var(--mono);font-weight:500;margin-top:4px">
-      <span>${mn?.toFixed(1)}</span><span>${q1?.toFixed(1)}</span><span style="color:var(--blue)">${med?.toFixed(1)}</span><span>${q3?.toFixed(1)}</span><span>${mx?.toFixed(1)}</span>
-    </div>
-  `;
-  // Frequency dist
-  const cv = clean(vals);
-  const bins=7, mn2=Math.min(...cv), mx2=Math.max(...cv), bw=(mx2-mn2)/bins;
-  const counts=Array(bins).fill(0);
-  cv.forEach(v=>{const i=Math.min(Math.floor((v-mn2)/bw),bins-1);counts[i]++;});
-  const labels=counts.map((_,i)=>`${(mn2+i*bw).toFixed(0)}–${(mn2+(i+1)*bw).toFixed(0)}`);
-  document.getElementById('freq-table-wrap').innerHTML = `<table>
-    <thead><tr><th>Bin</th><th>Count</th><th>Rel. freq</th><th>Cum. freq</th></tr></thead>
-    <tbody>${counts.map((c,i)=>{
-      let cum=counts.slice(0,i+1).reduce((a,b)=>a+b,0);
-      return `<tr><td class="mono">${labels[i]}</td><td>${c}</td><td>${(c/d.n*100).toFixed(1)}%</td><td>${(cum/d.n*100).toFixed(1)}%</td></tr>`;
-    }).join('')}</tbody>
-  </table>`;
-  // Histogram
-  mkChart('statsHistChart',{type:'bar',data:{labels,datasets:[{data:counts,backgroundColor:'rgba(56,139,253,.6)',borderColor:'rgba(56,139,253,1)',borderWidth:1,borderRadius:3,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-}
+// DESCRIPTIVE
+function renderStats(){fillSelects();drawStats();}
+function drawStats(){const col=document.getElementById('st-col')?.value;if(!col)return;const vals=DS.rows.map(r=>r[col]),d=desc(vals);document.getElementById('st-cn').textContent=col;const fmt=v=>isNaN(v)||v===undefined?'--':Number(v).toFixed(4);const kv=(k,v)=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${fmt(v)}</span></div>`;document.getElementById('st-l').innerHTML=kv('n',d.n)+kv('Mean',d.mean)+kv('Median',d.med)+kv('Std dev',d.sd)+kv('Variance',d.var)+kv('Skewness',d.skew)+kv('Kurtosis',d.kurt);document.getElementById('st-r').innerHTML=kv('Min',d.min)+kv('Q1',d.q1)+kv('Q3',d.q3)+kv('Max',d.max)+kv('IQR',d.iqr)+kv('CV %',d.cv)+kv('SEM',d.sem);const pct=v=>((v-d.min)/(d.max-d.min)*100).toFixed(1);document.getElementById('st-five').innerHTML=`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-bottom:4px"><span>Min</span><span>Q1</span><span>Med</span><span>Q3</span><span>Max</span></div><div style="position:relative;height:16px;background:var(--bg3);border-radius:3px"><div style="position:absolute;left:${pct(d.q1)}%;width:${pct(d.q3)-pct(d.q1)}%;height:100%;background:rgba(56,139,253,.3);border-radius:2px"></div><div style="position:absolute;left:${pct(d.med)}%;width:2px;height:100%;background:var(--bl);transform:translateX(-50%)"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mo);margin-top:3px"><span>${d.min?.toFixed(1)}</span><span>${d.q1?.toFixed(1)}</span><span style="color:var(--bl)">${d.med?.toFixed(1)}</span><span>${d.q3?.toFixed(1)}</span><span>${d.max?.toFixed(1)}</span></div>`;const v=cl(vals),bins=7,mn=Math.min(...v),mx=Math.max(...v),bw=(mx-mn)/bins;const cnts=Array(bins).fill(0);v.forEach(x=>{const i=Math.min(Math.floor((x-mn)/bw),bins-1);cnts[i]++;});mkC('stHist',{type:'bar',data:{labels:cnts.map((_,i)=>`${(mn+i*bw).toFixed(0)}`),datasets:[{data:cnts,backgroundColor:'rgba(56,139,253,.6)',borderColor:'#388bfd',borderWidth:1,borderRadius:3,borderSkipped:false}]},options:{...GO}});let cum=0;document.getElementById('st-freq').innerHTML=`<table><thead><tr><th>Bin</th><th>Count</th><th>Rel%</th><th>Cum%</th></tr></thead><tbody>${cnts.map((c,i)=>{cum+=c;return`<tr><td class="mo">${(mn+i*bw).toFixed(0)}</td><td>${c}</td><td>${(c/d.n*100).toFixed(1)}%</td><td>${(cum/d.n*100).toFixed(1)}%</td></tr>`;}).join('')}</tbody></table>`;}
+function toggleAllStats(){const c=document.getElementById('all-st');if(c.style.display==='none'){c.style.display='block';const rows=DS.num.map(col=>{const d=desc(DS.rows.map(r=>r[col]));return`<tr><td>${col}</td><td class="mo">${d.n}</td><td class="mo">${d.mean?.toFixed(2)}</td><td class="mo">${d.med?.toFixed(2)}</td><td class="mo">${d.sd?.toFixed(2)}</td><td class="mo">${d.min?.toFixed(2)}</td><td class="mo">${d.max?.toFixed(2)}</td><td class="mo">${d.skew?.toFixed(3)}</td><td class="mo">${d.kurt?.toFixed(3)}</td></tr>`;});document.getElementById('all-st-tbl').innerHTML=`<table><thead><tr><th>Column</th><th>n</th><th>Mean</th><th>Median</th><th>SD</th><th>Min</th><th>Max</th><th>Skew</th><th>Kurt</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;}else c.style.display='none';}
 
-// 
 // VISUALIZATIONS
-// 
-let currentViz='histogram';
-function renderViz() {
-  document.querySelectorAll('#viz-type-btns .btn').forEach(b=>{
-    b.addEventListener('click',()=>{
-      document.querySelectorAll('#viz-type-btns .btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active'); currentViz=b.dataset.viz; drawViz();
-    });
-  });
-  drawViz();
-  // Secondary charts
-  drawCatChart(); drawPairChart();
-}
+let vizType='hist';
+function renderViz(){document.querySelectorAll('#viz-btns .btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#viz-btns .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');vizType=b.dataset.viz;drawViz();}));drawViz();drawCatViz();drawGrpViz();}
+function drawViz(){const nc=DS.num,cc=DS.cat,ctrl=document.getElementById('viz-ctrl');
+if(vizType==='hist'){ctrl.innerHTML=`<label>Column</label><select id="vc1">${nc.map(c=>`<option>${c}</option>`).join('')}</select><label>Bins:<span id="vbn">7</span></label><input type="range" id="vb" min="3" max="20" value="7" oninput="document.getElementById('vbn').textContent=this.value;drawViz()">`;document.getElementById('vc1').onchange=drawViz;document.getElementById('viz-ttl').textContent='Histogram';const col=document.getElementById('vc1')?.value||nc[0];const bins=parseInt(document.getElementById('vb')?.value||7);const v=cl(DS.rows.map(r=>r[col])),mn=Math.min(...v),mx=Math.max(...v),bw=(mx-mn)/bins;const cnts=Array(bins).fill(0);v.forEach(x=>{const i=Math.min(Math.floor((x-mn)/bw),bins-1);cnts[i]++;});mkC('mainViz',{type:'bar',data:{labels:cnts.map((_,i)=>`${(mn+i*bw).toFixed(1)}`),datasets:[{data:cnts,backgroundColor:'rgba(56,139,253,.65)',borderColor:'#388bfd',borderWidth:1,borderRadius:4,borderSkipped:false}]},options:{...GO}});}
+else if(vizType==='scatter'){ctrl.innerHTML=`<label>X</label><select id="vcx">${nc.map(c=>`<option>${c}</option>`).join('')}</select><label>Y</label><select id="vcy">${nc.map((c,i)=>`<option${i===1?' selected':''}>${c}</option>`).join('')}</select>`;['vcx','vcy'].forEach(id=>{const el=document.getElementById(id);if(el)el.onchange=drawViz;});const xc=document.getElementById('vcx')?.value||nc[0],yc=document.getElementById('vcy')?.value||(nc[1]||nc[0]);const pts=DS.rows.filter(r=>r[xc]!==null&&r[yc]!==null).map(r=>({x:r[xc],y:r[yc]}));const r=pr(pts.map(p=>p.x),pts.map(p=>p.y));document.getElementById('viz-ttl').textContent=`Scatter: ${xc} vs ${yc} (r = ${r.toFixed(3)})`;mkC('mainViz',{type:'scatter',data:{datasets:[{data:pts,backgroundColor:'rgba(56,139,253,.7)',pointRadius:5}]},options:{...GO,plugins:{legend:{display:false}},scales:{x:{...GO.scales.x,title:{display:true,text:xc,color:'#8b949e'}},y:{...GO.scales.y,title:{display:true,text:yc,color:'#8b949e'}}}}});}
+else if(vizType==='box'){ctrl.innerHTML=`<label>Column</label><select id="vc1">${nc.map(c=>`<option>${c}</option>`).join('')}</select>`;document.getElementById('vc1').onchange=drawViz;document.getElementById('viz-ttl').textContent='Box plot';const col=document.getElementById('vc1')?.value||nc[0];const v=cl(DS.rows.map(r=>r[col])),q1=sp(v,25),q3=sp(v,75),mn=Math.min(...v),mx=Math.max(...v);mkC('mainViz',{type:'bar',data:{labels:[col],datasets:[{label:'Min-Q1',data:[[mn,q1]],backgroundColor:'rgba(139,148,158,.25)',borderColor:'#8b949e',borderWidth:1},{label:'IQR',data:[[q1,q3]],backgroundColor:'rgba(56,139,253,.45)',borderColor:'#388bfd',borderWidth:2},{label:'Q3-Max',data:[[q3,mx]],backgroundColor:'rgba(139,148,158,.25)',borderColor:'#8b949e',borderWidth:1}]},options:{...GO,plugins:{legend:{position:'top',labels:{color:'#8b949e',boxWidth:10,font:{size:10}}}}}});}
+else if(vizType==='bar'){const co=DS.cat.length?DS.cat:[DS.cols[0]];ctrl.innerHTML=`<label>Category</label><select id="vc1">${co.map(c=>`<option>${c}</option>`).join('')}</select>`;document.getElementById('vc1').onchange=drawViz;document.getElementById('viz-ttl').textContent='Bar chart';const col=document.getElementById('vc1')?.value||co[0];const freq={};DS.rows.forEach(r=>{if(r[col]!==null)freq[r[col]]=(freq[r[col]]||0)+1;});mkC('mainViz',{type:'bar',data:{labels:Object.keys(freq),datasets:[{data:Object.values(freq),backgroundColor:Object.keys(freq).map((_,i)=>CLRS[i%CLRS.length]+'aa'),borderRadius:5,borderSkipped:false}]},options:{...GO}});}
+else if(vizType==='line'){ctrl.innerHTML=`<label>Column</label><select id="vc1">${nc.map(c=>`<option>${c}</option>`).join('')}</select>`;document.getElementById('vc1').onchange=drawViz;document.getElementById('viz-ttl').textContent='Line chart';const col=document.getElementById('vc1')?.value||nc[0];mkC('mainViz',{type:'line',data:{labels:DS.rows.map((_,i)=>i+1),datasets:[{data:DS.rows.map(r=>r[col]),borderColor:'#388bfd',borderWidth:2,pointRadius:2,backgroundColor:'rgba(56,139,253,.1)',fill:true,tension:0.3}]},options:{...GO}});}
+else if(vizType==='corr'){ctrl.innerHTML='';document.getElementById('viz-ttl').textContent='Correlation matrix (r values)';const nc2=DS.num.slice(0,6);const matrix=nc2.map(c1=>nc2.map(c2=>+pr(cl(DS.rows.map(r=>r[c1])),cl(DS.rows.map(r=>r[c2]))).toFixed(2)));const dsets=[];nc2.forEach((c1,i)=>nc2.forEach((c2,j)=>{const r=matrix[i][j];dsets.push({x:j,y:nc2.length-1-i,r,bg:r>0?`rgba(56,139,253,${Math.abs(r)*.85+.1})`:`rgba(248,81,73,${Math.abs(r)*.85+.1})`});}););mkC('mainViz',{type:'scatter',data:{datasets:[{data:dsets.map(d=>({x:d.x,y:d.y})),backgroundColor:dsets.map(d=>d.bg),pointStyle:'rect',pointRadius:24,labels:dsets.map(d=>d.r)}]},options:{...GO,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`r = ${dsets[ctx.dataIndex].r}`}}},scales:{x:{min:-.5,max:nc2.length-.5,ticks:{callback:(_,i)=>nc2[i]||'',color:'#8b949e'},grid:{display:false}},y:{min:-.5,max:nc2.length-.5,ticks:{callback:(_,i)=>nc2[nc2.length-1-i]||'',color:'#8b949e'},grid:{display:false}}}}});}
+else if(vizType==='bubble'){ctrl.innerHTML=`<label>X</label><select id="vcx">${nc.map(c=>`<option>${c}</option>`).join('')}</select><label>Y</label><select id="vcy">${nc.map((c,i)=>`<option${i===1?' selected':''}>${c}</option>`).join('')}</select><label>Size</label><select id="vcz">${nc.map((c,i)=>`<option${i===2?' selected':''}>${c}</option>`).join('')}</select>`;['vcx','vcy','vcz'].forEach(id=>{const el=document.getElementById(id);if(el)el.onchange=drawViz;});document.getElementById('viz-ttl').textContent='Bubble chart';const xc=document.getElementById('vcx')?.value||nc[0],yc=document.getElementById('vcy')?.value||(nc[1]||nc[0]),zc=document.getElementById('vcz')?.value||(nc[2]||nc[0]);const mxZ=Math.max(...cl(DS.rows.map(r=>r[zc])));const pts=DS.rows.filter(r=>r[xc]!==null&&r[yc]!==null&&r[zc]!==null).map(r=>({x:r[xc],y:r[yc],r:Math.max(3,r[zc]/mxZ*20)}));mkC('mainViz',{type:'bubble',data:{datasets:[{data:pts,backgroundColor:'rgba(188,140,255,.5)',borderColor:'rgba(188,140,255,.8)',borderWidth:1}]},options:{...GO}});}
+else if(vizType==='area'){ctrl.innerHTML=`<label>Column</label><select id="vc1">${nc.map(c=>`<option>${c}</option>`).join('')}</select>`;document.getElementById('vc1').onchange=drawViz;document.getElementById('viz-ttl').textContent='Area chart';const col=document.getElementById('vc1')?.value||nc[0];mkC('mainViz',{type:'line',data:{labels:DS.rows.map((_,i)=>i+1),datasets:[{data:DS.rows.map(r=>r[col]),borderColor:'#3fb950',borderWidth:2,backgroundColor:'rgba(63,185,80,.15)',fill:true,tension:0.4,pointRadius:0}]},options:{...GO}});}}
+function drawCatViz(){if(!DS.cat.length)return;const col=DS.cat[0];const freq={};DS.rows.forEach(r=>{if(r[col]!==null)freq[r[col]]=(freq[r[col]]||0)+1;});mkC('catViz',{type:'doughnut',data:{labels:Object.keys(freq),datasets:[{data:Object.values(freq),backgroundColor:CLRS,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',boxWidth:9,font:{size:10}}}}}});}
+function drawGrpViz(){if(!DS.cat.length||!DS.num.length)return;const gc=DS.cat[0],nc=DS.num[0];const grps=[...new Set(DS.rows.map(r=>r[gc]).filter(v=>v!==null))];const means=grps.map(g=>+sm(cl(DS.rows.filter(r=>r[gc]===g).map(r=>r[nc]))).toFixed(2));mkC('grpViz',{type:'bar',data:{labels:grps,datasets:[{data:means,backgroundColor:grps.map((_,i)=>CLRS[i%CLRS.length]+'bb'),borderRadius:4,borderSkipped:false}]},options:{...GO}});}
 
-function drawViz() {
-  const nc=state.numCols,cc=state.catCols;
-  const ctrl=document.getElementById('viz-controls');
-  if (currentViz==='histogram') {
-    ctrl.innerHTML=`<label>Column</label><select id="viz-col">${nc.map(c=>`<option>${c}</option>`).join('')}</select><label>Bins</label><input type="range" id="viz-bins" min="4" max="20" value="7" style="width:100px"><span id="viz-bins-val" style="font-size:12px;font-family:var(--mono)">7</span>`;
-    document.getElementById('viz-bins').oninput=e=>{document.getElementById('viz-bins-val').textContent=e.target.value;drawViz();};
-    document.getElementById('viz-col').onchange=drawViz;
-    document.getElementById('viz-title').textContent='Histogram';
-    const col=document.getElementById('viz-col')?.value||nc[0];
-    const bins=parseInt(document.getElementById('viz-bins')?.value||7);
-    const vals=clean(state.rows.map(r=>r[col]));
-    const mn=Math.min(...vals),mx=Math.max(...vals),bw=(mx-mn)/bins;
-    const counts=Array(bins).fill(0);
-    vals.forEach(v=>{const i=Math.min(Math.floor((v-mn)/bw),bins-1);counts[i]++;});
-    const labels=counts.map((_,i)=>`${(mn+i*bw).toFixed(1)}`);
-    mkChart('mainVizChart',{type:'bar',data:{labels,datasets:[{data:counts,backgroundColor:'rgba(56,139,253,.6)',borderColor:'#388bfd',borderWidth:1,borderRadius:4,borderSkipped:false,label:col}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  }
-  else if (currentViz==='scatter') {
-    ctrl.innerHTML=`<label>X</label><select id="viz-x">${nc.map(c=>`<option>${c}</option>`).join('')}</select><label>Y</label><select id="viz-y">${nc.map((c,i)=>`<option${i===1?' selected':''}>${c}</option>`).join('')}</select>`;
-    document.getElementById('viz-x').onchange=drawViz;
-    document.getElementById('viz-y').onchange=drawViz;
-    document.getElementById('viz-title').textContent='Scatter plot';
-    const xCol=document.getElementById('viz-x')?.value||nc[0];
-    const yCol=document.getElementById('viz-y')?.value||(nc[1]||nc[0]);
-    const pts=state.rows.filter(r=>r[xCol]!==null&&r[yCol]!==null).map(r=>({x:r[xCol],y:r[yCol]}));
-    mkChart('mainVizChart',{type:'scatter',data:{datasets:[{data:pts,backgroundColor:'rgba(56,139,253,.7)',pointRadius:5,label:`${xCol} vs ${yCol}`}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:xCol,color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}},y:{title:{display:true,text:yCol,color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  }
-  else if (currentViz==='boxplot') {
-    ctrl.innerHTML=`<label>Column</label><select id="viz-col">${nc.map(c=>`<option>${c}</option>`).join('')}</select>`;
-    document.getElementById('viz-col').onchange=drawViz;
-    document.getElementById('viz-title').textContent='Box plot (IQR)';
-    const col=document.getElementById('viz-col')?.value||nc[0];
-    const vals=clean(state.rows.map(r=>r[col]));
-    const q1=sperc(vals,25),q3=sperc(vals,75),med=smedian(vals),mn=Math.min(...vals),mx=Math.max(...vals);
-    mkChart('mainVizChart',{type:'bar',data:{labels:[col],datasets:[
-      {label:'Min–Q1',data:[[mn,q1]],backgroundColor:'rgba(139,148,158,.3)',borderColor:'#8b949e',borderWidth:1},
-      {label:'Q1–Q3 (IQR)',data:[[q1,q3]],backgroundColor:'rgba(56,139,253,.5)',borderColor:'#388bfd',borderWidth:2},
-      {label:'Q3–Max',data:[[q3,mx]],backgroundColor:'rgba(139,148,158,.3)',borderColor:'#8b949e',borderWidth:1},
-    ]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#8b949e',font:{size:11}}}},scales:{y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  }
-  else if (currentViz==='bar') {
-    const catOpts=state.catCols.length?state.catCols:[state.columns[0]];
-    ctrl.innerHTML=`<label>Category</label><select id="viz-cat">${catOpts.map(c=>`<option>${c}</option>`).join('')}</select>`;
-    document.getElementById('viz-cat').onchange=drawViz;
-    document.getElementById('viz-title').textContent='Bar chart';
-    const col=document.getElementById('viz-cat')?.value||catOpts[0];
-    const freq={};state.rows.forEach(r=>{if(r[col]!==null)freq[r[col]]=(freq[r[col]]||0)+1;});
-    const labels=Object.keys(freq),vals=Object.values(freq);
-    const colors=['rgba(56,139,253,.7)','rgba(63,185,80,.7)','rgba(188,140,255,.7)','rgba(248,129,21,.7)','rgba(248,81,73,.7)','rgba(118,227,234,.7)'];
-    mkChart('mainVizChart',{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:labels.map((_,i)=>colors[i%colors.length]),borderRadius:5,borderSkipped:false}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e'}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  }
-  else if (currentViz==='corr') {
-    ctrl.innerHTML='';
-    document.getElementById('viz-title').textContent='Correlation matrix (Pearson r)';
-    const nc2=state.numCols.slice(0,6);
-    const matrix=nc2.map(c1=>nc2.map(c2=>{
-      const v1=clean(state.rows.map(r=>r[c1])),v2=clean(state.rows.map(r=>r[c2]));
-      return +pearsonR(v1,v2).toFixed(2);
-    }));
-    const datasets=[];
-    nc2.forEach((c1,i)=>nc2.forEach((c2,j)=>{
-      const r=matrix[i][j];
-      const alpha=Math.abs(r)*0.9+0.1;
-      datasets.push({x:j,y:nc2.length-1-i,v:r,bg:r>0?`rgba(56,139,253,${alpha})`:`rgba(248,81,73,${alpha})`});
-    }));
-    // Render as scatter with large points
-    mkChart('mainVizChart',{type:'scatter',
-      data:{datasets:[{data:datasets.map(d=>({x:d.x,y:d.y,r:22})),
-        backgroundColor:datasets.map(d=>d.bg),pointStyle:'rect',
-        labels:datasets.map(d=>d.v)}]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`r = ${datasets[ctx.dataIndex].v}`}}},
-        scales:{x:{min:-0.5,max:nc2.length-0.5,ticks:{callback:(_,i)=>nc2[i]||'',color:'#8b949e',maxRotation:30},grid:{display:false}},
-                y:{min:-0.5,max:nc2.length-0.5,ticks:{callback:(_,i)=>nc2[nc2.length-1-i]||'',color:'#8b949e'},grid:{display:false}}}}});
-  }
-}
-
-function drawCatChart() {
-  if (!state.catCols.length) return;
-  const col=state.catCols[0];
-  const freq={};state.rows.forEach(r=>{if(r[col]!==null)freq[r[col]]=(freq[r[col]]||0)+1;});
-  const colors=['#388bfd','#3fb950','#d29922','#bc8cff','#f85149','#76e3ea'];
-  mkChart('catChart',{type:'doughnut',data:{labels:Object.keys(freq),datasets:[{data:Object.values(freq),backgroundColor:colors,borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8b949e',boxWidth:10,font:{size:11}}}}}});
-}
-
-function drawPairChart() {
-  if (state.numCols.length<2) return;
-  const g=state.catCols.length?state.catCols[0]:null;
-  const groups=g?[...new Set(state.rows.map(r=>r[g]))]:['All'];
-  const colors=['#388bfd','#bc8cff','#3fb950','#d29922','#f85149'];
-  const datasets=groups.map((grp,i)=>{
-    const rows=g?state.rows.filter(r=>r[g]===grp):state.rows;
-    const vals=rows.map(r=>r[state.numCols[0]]).filter(v=>v!==null);
-    return {label:String(grp),data:vals.map((v,j)=>({x:j,y:v})),backgroundColor:colors[i%colors.length],pointRadius:4};
-  });
-  mkChart('pairChart',{type:'scatter',data:{datasets},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#8b949e',boxWidth:10,font:{size:11}}}},
-      scales:{x:{display:false},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-}
-
-// 
 // DISTRIBUTIONS
-// 
-let distType='normal';
-let distParams={...DIST.normal.params};
+let dType='normal',dP={...DIST.normal.params};
+function renderDist(){document.querySelectorAll('#dist-btns .btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('#dist-btns .btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');dType=b.dataset.dist;dP={...DIST[dType].params};buildDP();drawDist();}));buildDP();drawDist();fillSelects();document.getElementById('gof-col').onchange=drawGoF;document.getElementById('gof-dist').onchange=drawGoF;drawGoF();}
+function buildDP(){const d=DIST[dType];document.getElementById('dist-params').innerHTML=Object.entries(d.lbls).map(([k,l])=>`<div class="fr"><label>${l}: <span style="font-family:var(--mo);color:var(--tx)">${dP[k]}</span></label><input type="range" id="dp-${k}" min="${d.sl[k].min}" max="${d.sl[k].max}" step="${d.sl[k].step}" value="${dP[k]}"></div>`).join('');Object.keys(d.lbls).forEach(k=>{document.getElementById('dp-'+k).oninput=e=>{dP[k]=+e.target.value;buildDP();drawDist();};});}
+function drawDist(){const d=DIST[dType];const[lo,hi]=d.range(dP);const N=d.discrete?Math.min(hi-lo+1,50):100;const xs=d.discrete?Array.from({length:N},(_,i)=>lo+i):Array.from({length:N},(_,i)=>lo+i*(hi-lo)/(N-1));const pdfs=xs.map(x=>d.pdf(x,dP)),cdfs=xs.map(x=>Math.min(1,d.cdf(x,dP))),lbls=xs.map(x=>x.toFixed(d.discrete?0:2));mkC('pdfC',{type:d.discrete?'bar':'line',data:{labels:lbls,datasets:[{data:pdfs,backgroundColor:d.discrete?'rgba(56,139,253,.6)':'rgba(56,139,253,.12)',borderColor:'#388bfd',borderWidth:2,pointRadius:0,fill:!d.discrete,tension:0.3}]},options:{...GO}});mkC('cdfC',{type:'line',data:{labels:lbls,datasets:[{data:cdfs,backgroundColor:'rgba(63,185,80,.1)',borderColor:'#3fb950',borderWidth:2,pointRadius:0,fill:true,tension:0.3}]},options:{...GO,scales:{...GO.scales,y:{...GO.scales.y,min:0,max:1}}}});const s=d.stats(dP);document.getElementById('dist-stats').innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap">${[['Mean',s.mean?.toFixed?.(3)??'--'],['Variance',s.var===Infinity?'inf':s.var?.toFixed?.(3)],['Skewness',s.skew?.toFixed?.(3)],['Kurtosis',s.kurt?.toFixed?.(3)]].map(([l,v])=>`<div class="mc" style="min-width:80px"><div class="ml">${l}</div><div class="mv" style="font-size:14px">${v??'--'}</div></div>`).join('')}</div>`;}
+function drawGoF(){const col=document.getElementById('gof-col')?.value,dt=document.getElementById('gof-dist')?.value||'normal';if(!col)return;const vals=cl(DS.rows.map(r=>r[col])),d=desc(vals);let cFn;if(dt==='normal')cFn=x=>ncdf((x-d.mean)/d.sd);else if(dt==='exponential')cFn=x=>x<0?0:1-Math.exp(-(1/d.mean)*x);else cFn=x=>x<d.min?0:x>d.max?1:(x-d.min)/(d.max-d.min);const sorted=[...vals].sort((a,b)=>a-b);let D=0;sorted.forEach((x,i)=>{D=Math.max(D,Math.abs((i+1)/sorted.length-cFn(x)),Math.abs(i/sorted.length-cFn(x)));});const dCrit=1.36/Math.sqrt(vals.length),pass=D<=dCrit;document.getElementById('gof-res').innerHTML=`<div class="res ${pass?'ok':'ko'}"><div class="rt2">KS test - ${col} vs ${dt}</div><div class="kv"><span class="kk">D statistic</span><span class="kval">${D.toFixed(4)}</span></div><div class="kv"><span class="kk">D critical (a=0.05)</span><span class="kval">${dCrit.toFixed(4)}</span></div><div class="kv"><span class="kk">Verdict</span><span class="kval"><span class="bd ${pass?'bg':'br'}">${pass?'Fits '+dt:'Does not fit'}</span></span></div></div>`;const n=sorted.length,theor=sorted.map((_,i)=>ninv((i+.5)/n)),std=sorted.map(v=>(v-d.mean)/d.sd);mkC('qqC',{type:'scatter',data:{datasets:[{data:theor.map((t,i)=>({x:t,y:std[i]})),backgroundColor:'rgba(56,139,253,.7)',pointRadius:4},{type:'line',data:[{x:-3,y:-3},{x:3,y:3}],borderColor:'rgba(248,81,73,.5)',borderWidth:1.5,pointRadius:0}]},options:{...GO,plugins:{legend:{display:false}}}});}
 
-function renderDist() {
-  document.querySelectorAll('#dist-type-btns .btn').forEach(b=>{
-    b.addEventListener('click',()=>{
-      document.querySelectorAll('#dist-type-btns .btn').forEach(x=>x.classList.remove('active'));
-      b.classList.add('active'); distType=b.dataset.dist;
-      distParams={...DIST[distType].params}; buildDistParams(); drawDist();
-    });
-  });
-  buildDistParams(); drawDist();
-  document.getElementById('gof-col').onchange=drawGoF;
-  document.getElementById('gof-dist').onchange=drawGoF;
-  populateAllSelects();
-  drawGoF();
-}
-
-function buildDistParams() {
-  const d=DIST[distType];
-  document.getElementById('dist-params').innerHTML=Object.entries(d.labels).map(([k,lbl])=>`
-    <div class="form-row">
-      <label>${lbl}: <span style="font-family:var(--mono);color:var(--text)">${distParams[k]}</span></label>
-      <input type="range" id="dp-${k}" min="${d.sliders[k].min}" max="${d.sliders[k].max}" step="${d.sliders[k].step}" value="${distParams[k]}">
-    </div>
-  `).join('');
-  Object.keys(d.labels).forEach(k=>{
-    document.getElementById('dp-'+k).oninput=e=>{
-      distParams[k]=+e.target.value;
-      buildDistParams(); drawDist();
-    };
-  });
-}
-
-function drawDist() {
-  const d=DIST[distType];
-  const [lo,hi]=d.range(distParams);
-  const N=d.discrete?Math.min(hi-lo+1,60):100;
-  const xs=d.discrete?Array.from({length:N},(_,i)=>lo+i):Array.from({length:N},(_,i)=>lo+i*(hi-lo)/(N-1));
-  const pdfs=xs.map(x=>d.pdf(x,distParams));
-  const cdfs=xs.map(x=>Math.min(1,d.cdf(x,distParams)));
-  const labels=xs.map(x=>x.toFixed(d.discrete?0:2));
-  mkChart('pdfChart',{type:d.discrete?'bar':'line',data:{labels,datasets:[{data:pdfs,backgroundColor:d.discrete?'rgba(56,139,253,.6)':'rgba(56,139,253,.15)',borderColor:'#388bfd',borderWidth:2,pointRadius:0,fill:!d.discrete,tension:0.3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  mkChart('cdfChart',{type:'line',data:{labels,datasets:[{data:cdfs,backgroundColor:'rgba(63,185,80,.1)',borderColor:'#3fb950',borderWidth:2,pointRadius:0,fill:true,tension:0.3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-  // Stats
-  const s=d.stats(distParams);
-  document.getElementById('dist-stats').innerHTML=`<div style="display:flex;gap:16px;flex-wrap:wrap">
-    ${[['Mean',s.mean?.toFixed?s.mean.toFixed(3):s.mean],['Variance',s.variance===Infinity?'∞':s.variance?.toFixed?.(3)],['Skewness',s.skew?.toFixed?.(3)],['Excess kurtosis',s.kurt?.toFixed?.(3)]]
-    .map(([l,v])=>`<div class="metric" style="min-width:100px"><div class="metric-label">${l}</div><div class="metric-val" style="font-size:16px">${v??'—'}</div></div>`).join('')}
-  </div>`;
-}
-
-function drawGoF() {
-  const col=document.getElementById('gof-col')?.value;
-  const dt=document.getElementById('gof-dist')?.value||'normal';
-  if (!col) return;
-  const vals=clean(state.rows.map(r=>r[col]));
-  const d=describe(vals);
-  let cdfFn;
-  if(dt==='normal') cdfFn=x=>normCDF((x-d.mean)/d.sd);
-  else if(dt==='exponential') cdfFn=x=>x<0?0:1-Math.exp(-vals.length/vals.reduce((a,b)=>a+b,0)*x);
-  else cdfFn=x=>x<d.min?0:x>d.max?1:(x-d.min)/(d.max-d.min);
-  const sorted=[...vals].sort((a,b)=>a-b);
-  let D=0;
-  sorted.forEach((x,i)=>{D=Math.max(D,Math.abs((i+1)/sorted.length-cdfFn(x)),Math.abs(i/sorted.length-cdfFn(x)));});
-  const dCrit=1.36/Math.sqrt(vals.length);
-  const pass=D<=dCrit;
-  document.getElementById('gof-result').innerHTML=`<div class="result ${pass?'pass':'fail'}">
-    <div class="result-title">Kolmogorov-Smirnov test</div>
-    <div class="kv-row"><span class="kv-key">D statistic</span><span class="kv-val">${D.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">D critical (α=0.05)</span><span class="kv-val">${dCrit.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">n</span><span class="kv-val">${vals.length}</span></div>
-    <div class="kv-row"><span class="kv-key">Verdict</span><span class="kv-val"><span class="badge ${pass?'badge-green':'badge-red'}">${pass?'Fits '+dt:'Does not fit '+dt}</span></span></div>
-    <div class="result-sub">${pass?'Fail to reject: data is consistent with '+dt+' at α=0.05':'Reject: significant deviation from '+dt+' detected'}</div>
-  </div>`;
-  // QQ plot
-  const n=sorted.length;
-  const theor=sorted.map((_,i)=>normInv((i+0.5)/n));
-  const std=sorted.map(v=>(v-d.mean)/d.sd);
-  mkChart('qqChart',{type:'scatter',data:{datasets:[
-    {data:theor.map((t,i)=>({x:t,y:std[i]})),backgroundColor:'rgba(56,139,253,.7)',pointRadius:4,label:'Data'},
-    {data:[{x:-3,y:-3},{x:3,y:3}],type:'line',borderColor:'rgba(248,81,73,.6)',borderWidth:1.5,pointRadius:0,label:'Ideal'},
-  ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Theoretical quantiles',color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{title:{display:true,text:'Sample quantiles',color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}}}}});
-}
-
-// 
 // INFERENCE
-// 
-function renderInference() {
-  populateAllSelects();
-  // CI
-  document.getElementById('ci-col').onchange=drawCI;
-  document.getElementById('ci-level').oninput=e=>{document.getElementById('ci-level-val').textContent=e.target.value+'%';drawCI();};
-  // t-test
-  document.getElementById('ttest-col').onchange=drawTTest;
-  document.getElementById('ttest-mu').oninput=e=>{document.getElementById('ttest-mu-val').textContent=e.target.value;drawTTest();};
-  document.getElementById('ttest-alpha').onchange=drawTTest;
-  // set slider range sensibly
-  const col=document.getElementById('ttest-col').value;
-  if(col){const vals=clean(state.rows.map(r=>r[col]));const mx=Math.max(...vals);document.getElementById('ttest-mu').max=mx*1.5;document.getElementById('ttest-mu').value=smean(vals).toFixed(0);document.getElementById('ttest-mu-val').textContent=smean(vals).toFixed(0);}
-  document.getElementById('ttest2-col').onchange=drawTTest2;
-  document.getElementById('ttest2-group').onchange=drawTTest2;
-  document.getElementById('norm-col').onchange=drawNorm;
-  drawCI(); drawTTest(); drawTTest2(); drawNorm();
+function renderInf(){fillSelects();const col=document.getElementById('tt-col')?.value;if(col){const v=cl(DS.rows.map(r=>r[col]));const mx=Math.max(...v)*1.5;document.getElementById('tt-mu').max=mx;document.getElementById('tt-mu').value=sm(v).toFixed(0);document.getElementById('tt-mv').textContent=sm(v).toFixed(0);}drawCI();drawTT();drawTT2();drawNT();}
+function drawCI(){const col=document.getElementById('ci-col')?.value;if(!col)return;const lv=parseInt(document.getElementById('ci-lvl')?.value||95),alpha=(100-lv)/100;const v=cl(DS.rows.map(r=>r[col])),m=sm(v),s=ss(v),n=v.length,se=s/Math.sqrt(n),t2=tc(alpha,n-1),me=t2*se;document.getElementById('ci-res').innerHTML=`<div class="res ok"><div class="rt2">${lv}% CI for ${col}</div><div class="rv2">[${(m-me).toFixed(2)}, ${(m+me).toFixed(2)}]</div><div style="margin-top:8px">${[['x-bar',m.toFixed(4)],['s',s.toFixed(4)],['SE',se.toFixed(4)],['t*',t2.toFixed(3)],['ME',me.toFixed(4)],['n',n]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}</div></div>`;}
+function drawTT(){const col=document.getElementById('tt-col')?.value;if(!col)return;const mu0=parseFloat(document.getElementById('tt-mu')?.value||75),alpha=parseFloat(document.getElementById('tt-alpha')?.value||0.05);const v=cl(DS.rows.map(r=>r[col])),m=sm(v),s=ss(v),n=v.length,se=s/Math.sqrt(n),t2=(m-mu0)/se,pv=Math.min(1,2*(1-ncdf(Math.abs(t2)))),rej=pv<alpha;document.getElementById('tt-res').innerHTML=`<div class="res ${rej?'ko':'ok'}"><div class="rt2">H0: mu=${mu0}</div>${[['t',t2.toFixed(4)],['df',n-1],['p-value',pv.toFixed(4)],['Decision',`<span class="bd ${rej?'br':'bg'}">${rej?'Reject H0':'Fail to reject'}</span>`]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}<div class="rs">${rej?`Evidence mean != ${mu0} (p=${pv.toFixed(3)})`:`No evidence to reject mu=${mu0}`}</div></div>`;}
+function drawTT2(){const col=document.getElementById('tt2-col')?.value,gc=document.getElementById('tt2-grp')?.value;if(!col||!gc)return;const grps=[...new Set(DS.rows.map(r=>r[gc]).filter(v=>v!==null))].slice(0,2);if(grps.length<2){document.getElementById('tt2-res').innerHTML='<div class="res wa"><div class="rs">Need at least 2 groups.</div></div>';return;}const v1=cl(DS.rows.filter(r=>r[gc]===grps[0]).map(r=>r[col])),v2=cl(DS.rows.filter(r=>r[gc]===grps[1]).map(r=>r[col]));const m1=sm(v1),m2=sm(v2),s1=ss(v1),s2=ss(v2),n1=v1.length,n2=v2.length,se=Math.sqrt(s1**2/n1+s2**2/n2),t2=(m1-m2)/se,df=(s1**2/n1+s2**2/n2)**2/((s1**2/n1)**2/(n1-1)+(s2**2/n2)**2/(n2-1)),pv=Math.min(1,2*(1-ncdf(Math.abs(t2)))),rej=pv<0.05,pooled=Math.sqrt(((n1-1)*s1**2+(n2-1)*s2**2)/(n1+n2-2)),d=Math.abs(m1-m2)/pooled,mag=d<0.2?'negligible':d<0.5?'small':d<0.8?'medium':'large';document.getElementById('tt2-res').innerHTML=`<div class="res ${rej?'ko':'ok'}"><div class="rt2">Welch t-test: ${col} by ${gc}</div>${[[grps[0]+' mean',m1.toFixed(3)+' (n='+n1+')'],[grps[1]+' mean',m2.toFixed(3)+' (n='+n2+')'],['t',t2.toFixed(4)],['df',df.toFixed(1)],['p-value',pv.toFixed(4)],["Cohen's d",`${d.toFixed(3)} (${mag})`],['Decision',`<span class="bd ${rej?'br':'bg'}">${rej?'Reject H0':'Fail to reject'}</span>`]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}</div>`;}
+function drawNT(){const col=document.getElementById('nt-col')?.value;if(!col)return;const v=cl(DS.rows.map(r=>r[col])),n=v.length,skew=sk(v),kurt=ku(v),JB=(n/6)*(skew**2+kurt**2/4),jbp=Math.max(0,1-chiSqCDF(JB,2));const sorted=[...v].sort((a,b)=>a-b),W=pr(sorted,sorted.map((_,i)=>ninv((i+.375)/(n+.25))))**2,norm=Math.abs(skew)<1&&Math.abs(kurt)<2&&W>0.9;document.getElementById('nt-res').innerHTML=`<div class="res ${norm?'ok':'wa'}"><div class="rt2">Normality: ${col}</div>${[['Skewness',`${skew.toFixed(4)} <span class="bd ${Math.abs(skew)<1?'bg':'ba'}">${Math.abs(skew)<1?'OK':'notable'}</span>`],['Kurtosis',`${kurt.toFixed(4)} <span class="bd ${Math.abs(kurt)<2?'bg':'ba'}">${Math.abs(kurt)<2?'OK':'notable'}</span>`],['Jarque-Bera',`${JB.toFixed(3)} (p=${jbp.toFixed(3)})`],['Shapiro-Wilk W',`${W.toFixed(4)} <span class="bd ${W>0.9?'bg':'br'}">${W>0.9?'near normal':'concern'}</span>`],['Verdict',`<span class="bd ${norm?'bg':'ba'}">${norm?'Approx. normal':'May deviate'}</span>`]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}</div>`;}
+
+// ANOVA
+function renderAnova(){fillSelects();}
+function runAnova(){
+  const col=document.getElementById('av-col').value,gc=document.getElementById('av-grp').value;
+  const grps=[...new Set(DS.rows.map(r=>r[gc]).filter(v=>v!==null))];
+  const groups=grps.map(g=>cl(DS.rows.filter(r=>r[gc]===g).map(r=>r[col])));
+  const ns=groups.map(g=>g.length),means=groups.map(g=>sm(g)),N=ns.reduce((a,b)=>a+b,0),gm=groups.flat().reduce((a,b)=>a+b,0)/N;
+  const SSB=groups.reduce((acc,g,i)=>acc+ns[i]*(means[i]-gm)**2,0),SSW=groups.reduce((acc,g,i)=>acc+g.reduce((a,x)=>a+(x-means[i])**2,0),0);
+  const dfB=grps.length-1,dfW=N-grps.length,MSB=SSB/dfB,MSW=SSW/dfW,F=MSB/MSW,pv=Math.max(0,1-fCDF(F,dfB,dfW)),rej=pv<0.05,eta=SSB/(SSB+SSW);
+  document.getElementById('av-res').innerHTML=`<div class="res ${rej?'ko':'ok'}"><div class="rt2">ANOVA: ${col} by ${gc}</div><table><thead><tr><th>Source</th><th>SS</th><th>df</th><th>MS</th><th>F</th><th>p</th></tr></thead><tbody><tr><td>Between</td><td class="mo">${SSB.toFixed(3)}</td><td>${dfB}</td><td class="mo">${MSB.toFixed(3)}</td><td class="mo">${F.toFixed(4)}</td><td><span class="bd ${rej?'br':'bg'}">${pv.toFixed(4)}</span></td></tr><tr><td>Within</td><td class="mo">${SSW.toFixed(3)}</td><td>${dfW}</td><td class="mo">${MSW.toFixed(3)}</td><td>-</td><td>-</td></tr><tr><td><b>Total</b></td><td class="mo">${(SSB+SSW).toFixed(3)}</td><td>${N-1}</td><td>-</td><td>-</td><td>-</td></tr></tbody></table><div class="kv" style="margin-top:8px"><span class="kk">eta-squared</span><span class="kval">${eta.toFixed(4)}</span></div><div class="kv"><span class="kk">Decision</span><span class="kval"><span class="bd ${rej?'br':'bg'}">${rej?'Reject H0':'Fail to reject H0'}</span></span></div></div>`;
+  const tRes=[];for(let i=0;i<grps.length;i++)for(let j=i+1;j<grps.length;j++){const se=Math.sqrt(MSW/2*(1/ns[i]+1/ns[j])),q=Math.abs(means[i]-means[j])/se,p2=Math.min(1,2*(1-ncdf(q/Math.sqrt(2))));tRes.push({g1:grps[i],g2:grps[j],diff:+(means[i]-means[j]).toFixed(3),q:+q.toFixed(3),p:+p2.toFixed(4),sig:p2<0.05});}
+  document.getElementById('tukey-res').innerHTML=`<table><thead><tr><th>Group 1</th><th>Group 2</th><th>Diff</th><th>q</th><th>p adj</th><th>Sig</th></tr></thead><tbody>${tRes.map(r=>`<tr><td>${r.g1}</td><td>${r.g2}</td><td class="mo">${r.diff}</td><td class="mo">${r.q}</td><td class="mo">${r.p}</td><td><span class="bd ${r.sig?'br':'bg'}">${r.sig?'*':'ns'}</span></td></tr>`).join('')}</tbody></table>`;
+  mkC('avChart',{type:'bar',data:{labels:grps,datasets:[{data:means.map(m=>+m.toFixed(2)),backgroundColor:grps.map((_,i)=>CLRS[i%CLRS.length]+'bb'),borderRadius:4,borderSkipped:false}]},options:{...GO,plugins:{legend:{display:false}}}});
 }
 
-function drawCI() {
-  const col=document.getElementById('ci-col')?.value; if(!col) return;
-  const level=parseInt(document.getElementById('ci-level')?.value||95);
-  const alpha=(100-level)/100;
-  const vals=clean(state.rows.map(r=>r[col]));
-  const m=smean(vals),s=sstd(vals),n=vals.length,se=s/Math.sqrt(n),tc=tCrit(alpha,n-1),me=tc*se;
-  document.getElementById('ci-result').innerHTML=`<div class="result pass">
-    <div class="result-title">${level}% Confidence Interval — ${col}</div>
-    <div class="result-val">[${(m-me).toFixed(2)}, ${(m+me).toFixed(2)}]</div>
-    <div style="margin-top:10px">
-      <div class="kv-row"><span class="kv-key">x̄ (sample mean)</span><span class="kv-val">${m.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">s (std dev)</span><span class="kv-val">${s.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">SE</span><span class="kv-val">${se.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">t* (critical)</span><span class="kv-val">${tc.toFixed(3)}</span></div>
-      <div class="kv-row"><span class="kv-key">Margin of error</span><span class="kv-val">±${me.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">n</span><span class="kv-val">${n}</span></div>
-    </div>
-    <div class="result-sub">We are ${level}% confident the true mean of ${col} lies between ${(m-me).toFixed(2)} and ${(m+me).toFixed(2)}.</div>
-  </div>`;
-}
-
-function drawTTest() {
-  const col=document.getElementById('ttest-col')?.value; if(!col) return;
-  const mu0=parseFloat(document.getElementById('ttest-mu')?.value||75);
-  const alpha=parseFloat(document.getElementById('ttest-alpha')?.value||0.05);
-  const vals=clean(state.rows.map(r=>r[col]));
-  const m=smean(vals),s=sstd(vals),n=vals.length,se=s/Math.sqrt(n);
-  const t=(m-mu0)/se,df=n-1;
-  const pVal=Math.min(1,2*(1-normCDF(Math.abs(t))));
-  const reject=pVal<alpha;
-  document.getElementById('ttest-result').innerHTML=`<div class="result ${reject?'fail':'pass'}">
-    <div class="result-title">H₀: μ = ${mu0} | H₁: μ ≠ ${mu0}</div>
-    <div style="margin-top:8px">
-      <div class="kv-row"><span class="kv-key">t statistic</span><span class="kv-val">${t.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">df</span><span class="kv-val">${df}</span></div>
-      <div class="kv-row"><span class="kv-key">p-value (2-tailed)</span><span class="kv-val">${pVal.toFixed(4)}</span></div>
-      <div class="kv-row"><span class="kv-key">α</span><span class="kv-val">${alpha}</span></div>
-      <div class="kv-row"><span class="kv-key">Decision</span><span class="kv-val"><span class="badge ${reject?'badge-red':'badge-green'}">${reject?'Reject H₀':'Fail to reject H₀'}</span></span></div>
-    </div>
-    <div class="result-sub">${reject?`Strong evidence the mean of ${col} ≠ ${mu0} (p=${pVal.toFixed(3)} < α=${alpha})`:`Insufficient evidence to reject μ=${mu0} for ${col} (p=${pVal.toFixed(3)} ≥ α=${alpha})`}</div>
-  </div>`;
-}
-
-function drawTTest2() {
-  const col=document.getElementById('ttest2-col')?.value;
-  const grpCol=document.getElementById('ttest2-group')?.value;
-  if(!col||!grpCol) return;
-  const groups=[...new Set(state.rows.map(r=>r[grpCol]).filter(v=>v!==null))].slice(0,2);
-  if(groups.length<2){document.getElementById('ttest2-result').innerHTML='<div class="result warn"><div class="result-sub">Need at least 2 groups in selected column.</div></div>';return;}
-  const v1=clean(state.rows.filter(r=>r[grpCol]===groups[0]).map(r=>r[col]));
-  const v2=clean(state.rows.filter(r=>r[grpCol]===groups[1]).map(r=>r[col]));
-  const m1=smean(v1),m2=smean(v2),s1=sstd(v1),s2=sstd(v2),n1=v1.length,n2=v2.length;
-  const se=Math.sqrt(s1**2/n1+s2**2/n2);
-  const t=(m1-m2)/se;
-  const df=(s1**2/n1+s2**2/n2)**2/((s1**2/n1)**2/(n1-1)+(s2**2/n2)**2/(n2-1));
-  const pVal=Math.min(1,2*(1-normCDF(Math.abs(t))));
-  const reject=pVal<0.05;
-  document.getElementById('ttest2-result').innerHTML=`<div class="result ${reject?'fail':'pass'}">
-    <div class="result-title">Two-sample Welch t-test (${col} by ${grpCol})</div>
-    <div class="kv-row"><span class="kv-key">${groups[0]} mean</span><span class="kv-val">${m1.toFixed(4)} (n=${n1})</span></div>
-    <div class="kv-row"><span class="kv-key">${groups[1]} mean</span><span class="kv-val">${m2.toFixed(4)} (n=${n2})</span></div>
-    <div class="kv-row"><span class="kv-key">Difference</span><span class="kv-val">${(m1-m2).toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">t statistic</span><span class="kv-val">${t.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">df (Welch)</span><span class="kv-val">${df.toFixed(1)}</span></div>
-    <div class="kv-row"><span class="kv-key">p-value</span><span class="kv-val">${pVal.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">Decision</span><span class="kv-val"><span class="badge ${reject?'badge-red':'badge-green'}">${reject?'Reject H₀':'Fail to reject'}</span></span></div>
-  </div>`;
-}
-
-function drawNorm() {
-  const col=document.getElementById('norm-col')?.value; if(!col) return;
-  const vals=clean(state.rows.map(r=>r[col]));
-  const skew=sskew(vals),kurt=skurt(vals);
-  const JB=(vals.length/6)*(skew**2+kurt**2/4);
-  const jbP=Math.max(0,1-chiSqCDF(JB,2));
-  const sorted=[...vals].sort((a,b)=>a-b);
-  const m=smean(vals),s=sstd(vals);
-  const W=pearsonR(sorted,sorted.map((_,i)=>normInv((i+0.375)/(vals.length+0.25))))**2;
-  const normal=Math.abs(skew)<1&&Math.abs(kurt)<2&&W>0.9;
-  document.getElementById('norm-result').innerHTML=`<div class="result ${normal?'pass':'warn'}">
-    <div class="result-title">Normality assessment — ${col}</div>
-    <div class="kv-row"><span class="kv-key">Skewness</span><span class="kv-val">${skew.toFixed(4)} <span class="badge ${Math.abs(skew)<1?'badge-green':'badge-amber'}">${Math.abs(skew)<1?'OK':'notable'}</span></span></div>
-    <div class="kv-row"><span class="kv-key">Excess kurtosis</span><span class="kv-val">${kurt.toFixed(4)} <span class="badge ${Math.abs(kurt)<2?'badge-green':'badge-amber'}">${Math.abs(kurt)<2?'OK':'notable'}</span></span></div>
-    <div class="kv-row"><span class="kv-key">Jarque-Bera</span><span class="kv-val">${JB.toFixed(4)} (p=${jbP.toFixed(3)})</span></div>
-    <div class="kv-row"><span class="kv-key">Shapiro-Wilk W</span><span class="kv-val">${W.toFixed(4)} <span class="badge ${W>0.9?'badge-green':'badge-red'}">${W>0.9?'near normal':'concern'}</span></span></div>
-    <div class="kv-row"><span class="kv-key">Verdict</span><span class="kv-val"><span class="badge ${normal?'badge-green':'badge-amber'}">${normal?'Approximately normal':'May deviate'}</span></span></div>
-  </div>`;
-}
-
-function chiSqCDF(x,df) {
-  if(x<=0) return 0;
-  let sum=1/df,term=1/df;
-  for(let k=1;k<200;k++){term*=x/(df/2+k);sum+=term;if(Math.abs(term)<1e-10)break;}
-  return Math.min(1,sum*Math.exp(-x/2+(df/2)*Math.log(x/2))*Math.exp(-lgammaApprox(df/2)));
-}
-function lgammaApprox(z){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,1.208650973866179e-3,-5.395239384953e-6];let y=z,tmp=z+5.5;tmp-=(z+0.5)*Math.log(tmp);let s=1.000000000190015;for(let j=0;j<6;j++){y++;s+=c[j]/y;}return -tmp+Math.log(2.5066282746310005*s/z);}
-
-// 
 // REGRESSION
-// 
-let regModel=null;
-function renderRegression() {
-  populateAllSelects();
-  document.getElementById('reg-x').onchange=drawRegression;
-  document.getElementById('reg-y').onchange=drawRegression;
-  drawRegression();
+let regM=null;
+function renderReg(){fillSelects();drawReg();}
+function drawReg(){const xc=document.getElementById('rx')?.value,yc=document.getElementById('ry')?.value;if(!xc||!yc||xc===yc)return;const pairs=DS.rows.filter(r=>r[xc]!==null&&r[yc]!==null),xs=pairs.map(r=>r[xc]),ys=pairs.map(r=>r[yc]),n=xs.length,mx=sm(xs),my=sm(ys);let sxy=0,sxx=0;for(let i=0;i<n;i++){sxy+=(xs[i]-mx)*(ys[i]-my);sxx+=(xs[i]-mx)**2;}const b=sxy/sxx,a=my-b*mx,fitted=xs.map(x=>a+b*x),res=ys.map((y,i)=>y-fitted[i]);const ssR=res.reduce((s,r)=>s+r**2,0),ssT=ys.reduce((s,y)=>s+(y-my)**2,0),r2=1-ssR/ssT,rmse=Math.sqrt(ssR/(n-2)),se_b=rmse/Math.sqrt(sxx),se_a=rmse*Math.sqrt(1/n+mx**2/sxx),tb=b/se_b,ta=a/se_a,pb=2*(1-ncdf(Math.abs(tb))),pa=2*(1-ncdf(Math.abs(ta))),F=(ssT-ssR)/(ssR/(n-2));regM={a,b,mx,sxx,rmse,n,xs,ys,xc,yc,r2};document.getElementById('req').textContent=`y = ${b.toFixed(4)}x ${a>=0?'+ ':''}${a.toFixed(4)}`;document.getElementById('rkv').innerHTML=[['R',Math.sqrt(r2).toFixed(4)],['R2',r2.toFixed(4)],['Adj-R2',(1-(1-r2)*(n-1)/(n-2)).toFixed(4)],['RMSE',rmse.toFixed(4)],['F(1,'+(n-2)+')',F.toFixed(3)],['n',n]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('');document.getElementById('rcoef').innerHTML=`<table><thead><tr><th>Term</th><th>Est.</th><th>SE</th><th>t</th><th>p</th></tr></thead><tbody><tr><td>Intercept</td><td class="mo">${a.toFixed(4)}</td><td class="mo">${se_a.toFixed(4)}</td><td class="mo">${ta.toFixed(3)}</td><td><span class="bd ${pa<.05?'bg':'ba'}">${pa.toFixed(4)}</span></td></tr><tr><td>${xc}</td><td class="mo">${b.toFixed(4)}</td><td class="mo">${se_b.toFixed(4)}</td><td class="mo">${tb.toFixed(3)}</td><td><span class="bd ${pb<.05?'bg':'ba'}">${pb.toFixed(4)}</span></td></tr></tbody></table>`;const xr=[Math.min(...xs),Math.max(...xs)];mkC('rScatter',{type:'scatter',data:{datasets:[{data:xs.map((x,i)=>({x,y:ys[i]})),backgroundColor:'rgba(56,139,253,.6)',pointRadius:5},{type:'line',data:[{x:xr[0],y:a+b*xr[0]},{x:xr[1],y:a+b*xr[1]}],borderColor:'#f85149',borderWidth:2,pointRadius:0}]},options:{...GO,plugins:{legend:{display:false}}}});mkC('rResid',{type:'scatter',data:{datasets:[{data:fitted.map((f,i)=>({x:f,y:res[i]})),backgroundColor:'rgba(188,140,255,.6)',pointRadius:4},{type:'line',data:[{x:Math.min(...fitted),y:0},{x:Math.max(...fitted),y:0}],borderColor:'rgba(248,81,73,.5)',borderWidth:1.5,pointRadius:0}]},options:{...GO,plugins:{legend:{display:false}}}});}
+function doPred(){if(!regM)return;const xn=parseFloat(document.getElementById('px').value);if(isNaN(xn))return;const yh=regM.a+regM.b*xn,sp2=regM.rmse*Math.sqrt(1+1/regM.n+(xn-regM.mx)**2/regM.sxx),me=1.96*sp2;document.getElementById('pred-res').innerHTML=`<div class="res ok"><div class="kv"><span class="kk">y-hat for ${regM.xc}=${xn}</span><span class="kval" style="font-size:16px;color:var(--cy)">${yh.toFixed(4)}</span></div><div class="kv"><span class="kk">95% prediction interval</span><span class="kval">[${(yh-me).toFixed(2)}, ${(yh+me).toFixed(2)}]</span></div></div>`;}
+
+// MULTIPLE REGRESSION
+function renderMR(){fillSelects();}
+function runMR(){
+  const yc=document.getElementById('mr-y')?.value;
+  const xCols=[...document.querySelectorAll('#mr-x-checks input:checked')].map(el=>el.value).filter(c=>c!==yc);
+  if(xCols.length<1){document.getElementById('mr-res').innerHTML='<div class="res wa"><div class="rs">Select at least 1 predictor.</div></div>';return;}
+  const rows=DS.rows.filter(r=>r[yc]!==null&&xCols.every(c=>r[c]!==null));
+  const X=rows.map(r=>xCols.map(c=>r[c])),y=rows.map(r=>r[yc]),n=X.length,p=xCols.length;
+  const Xb=X.map(row=>[1,...row]);const XT=Xb[0].map((_,j)=>Xb.map(r=>r[j]));
+  const mmul=(A,B)=>{const ra=A.length,cb=B[0].length,k=B.length;return Array.from({length:ra},(_,i)=>Array.from({length:cb},(_,j)=>Array.from({length:k},(_,l)=>A[i][l]*B[l][j]).reduce((a,b)=>a+b,0)));};
+  const inv=M=>{const m=M.length,A=M.map(r=>[...r]),I=Array.from({length:m},(_,i)=>Array.from({length:m},(_,j)=>i===j?1:0));for(let c=0;c<m;c++){let mr=c;for(let r=c+1;r<m;r++)if(Math.abs(A[r][c])>Math.abs(A[mr][c]))mr=r;[A[c],A[mr]]=[A[mr],A[c]];[I[c],I[mr]]=[I[mr],I[c]];const pv=A[c][c];for(let j=0;j<m;j++){A[c][j]/=pv;I[c][j]/=pv;}for(let r=0;r<m;r++){if(r===c)continue;const f=A[r][c];for(let j=0;j<m;j++){A[r][j]-=f*A[c][j];I[r][j]-=f*I[c][j];}}}return I;};
+  const XtX=mmul(XT,Xb),XtXinv=inv(XtX),Xty=mmul(XT,y.map(v=>[v])),beta=mmul(XtXinv,Xty).map(r=>r[0]);
+  const fitted=Xb.map(r=>r.reduce((s,x,i)=>s+x*beta[i],0)),res=y.map((yi,i)=>yi-fitted[i]);
+  const my=sm(y),ssR=res.reduce((a,r)=>a+r**2,0),ssT=y.reduce((a,yi)=>a+(yi-my)**2,0),r2=1-ssR/ssT,r2a=1-(1-r2)*(n-1)/(n-p-1),mse=ssR/(n-p-1),rmse=Math.sqrt(mse);
+  const seCoef=XtXinv.map((row,i)=>Math.sqrt(Math.abs(row[i])*mse)),tStats=beta.map((b,i)=>b/seCoef[i]),pVals=tStats.map(t=>Math.min(1,2*(1-ncdf(Math.abs(t)))));
+  const F=(ssT-ssR)/p/(ssR/(n-p-1)),names=['Intercept',...xCols];
+  document.getElementById('mr-res').innerHTML=`<div style="margin-top:10px">${[['R2',r2.toFixed(4)],['Adj-R2',r2a.toFixed(4)],['RMSE',rmse.toFixed(4)],['F('+p+','+(n-p-1)+')',F.toFixed(3)],['n',n]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}</div><div class="ct" style="margin-top:12px">Coefficients</div><div class="tw"><table><thead><tr><th>Term</th><th>Estimate</th><th>SE</th><th>t</th><th>p</th></tr></thead><tbody>${names.map((nm,i)=>`<tr><td>${nm}</td><td class="mo">${beta[i].toFixed(4)}</td><td class="mo">${seCoef[i].toFixed(4)}</td><td class="mo">${tStats[i].toFixed(3)}</td><td><span class="bd ${pVals[i]<.05?'bg':'ba'}">${pVals[i].toFixed(4)}</span></td></tr>`).join('')}</tbody></table></div>`;
+  mkC('mrFit',{type:'scatter',data:{datasets:[{data:fitted.map((f,i)=>({x:y[i],y:f})),backgroundColor:'rgba(56,139,253,.6)',pointRadius:4},{type:'line',data:[{x:Math.min(...y),y:Math.min(...y)},{x:Math.max(...y),y:Math.max(...y)}],borderColor:'rgba(248,81,73,.5)',borderWidth:1.5,pointRadius:0}]},options:{...GO,plugins:{legend:{display:false}},scales:{x:{...GO.scales.x,title:{display:true,text:'Actual',color:'#8b949e'}},y:{...GO.scales.y,title:{display:true,text:'Fitted',color:'#8b949e'}}}}});
+  mkC('mrResid',{type:'scatter',data:{datasets:[{data:fitted.map((f,i)=>({x:f,y:res[i]})),backgroundColor:'rgba(188,140,255,.6)',pointRadius:4},{type:'line',data:[{x:Math.min(...fitted),y:0},{x:Math.max(...fitted),y:0}],borderColor:'rgba(248,81,73,.5)',borderWidth:1.5,pointRadius:0}]},options:{...GO,plugins:{legend:{display:false}}}});
 }
 
-function drawRegression() {
-  const xCol=document.getElementById('reg-x')?.value;
-  const yCol=document.getElementById('reg-y')?.value;
-  if(!xCol||!yCol||xCol===yCol) return;
-  const pairs=state.rows.filter(r=>r[xCol]!==null&&r[yCol]!==null);
-  const xs=pairs.map(r=>r[xCol]),ys=pairs.map(r=>r[yCol]);
-  const n=xs.length,mx=smean(xs),my=smean(ys);
-  let sxy=0,sxx=0;
-  for(let i=0;i<n;i++){sxy+=(xs[i]-mx)*(ys[i]-my);sxx+=(xs[i]-mx)**2;}
-  const b=sxy/sxx,a=my-b*mx;
-  const fitted=xs.map(x=>a+b*x);
-  const residuals=ys.map((y,i)=>y-fitted[i]);
-  const ssRes=residuals.reduce((s,r)=>s+r**2,0);
-  const ssTot=ys.reduce((s,y)=>s+(y-my)**2,0);
-  const r2=1-ssRes/ssTot,rmse=Math.sqrt(ssRes/(n-2));
-  const se_b=rmse/Math.sqrt(sxx),se_a=rmse*Math.sqrt(1/n+mx**2/sxx);
-  const t_b=b/se_b,t_a=a/se_a;
-  const p_b=2*(1-normCDF(Math.abs(t_b))),p_a=2*(1-normCDF(Math.abs(t_a)));
-  const F=(ssTot-ssRes)/(ssRes/(n-2));
-  regModel={a,b,mx,sxx,rmse,n,xs,ys,fitted,residuals,xCol,yCol,r2};
-  document.getElementById('reg-equation').textContent=`ŷ = ${b.toFixed(4)}x ${a>=0?'+':''} ${a.toFixed(4)}`;
-  document.getElementById('reg-metrics-kv').innerHTML=`
-    <div class="kv-row"><span class="kv-key">R</span><span class="kv-val">${Math.sqrt(r2).toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">R²</span><span class="kv-val">${r2.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">Adj. R²</span><span class="kv-val">${(1-(1-r2)*(n-1)/(n-2)).toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">RMSE</span><span class="kv-val">${rmse.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">F(1,${n-2})</span><span class="kv-val">${F.toFixed(3)}</span></div>
-    <div class="kv-row"><span class="kv-key">n</span><span class="kv-val">${n}</span></div>
-  `;
-  document.getElementById('reg-coef-table').innerHTML=`<table>
-    <thead><tr><th>Term</th><th>Estimate</th><th>SE</th><th>t</th><th>p-value</th></tr></thead>
-    <tbody>
-      <tr><td>Intercept</td><td class="mono">${a.toFixed(4)}</td><td class="mono">${se_a.toFixed(4)}</td><td class="mono">${t_a.toFixed(3)}</td><td><span class="badge ${p_a<0.05?'badge-green':'badge-amber'}">${p_a.toFixed(4)}</span></td></tr>
-      <tr><td>${xCol}</td><td class="mono">${b.toFixed(4)}</td><td class="mono">${se_b.toFixed(4)}</td><td class="mono">${t_b.toFixed(3)}</td><td><span class="badge ${p_b<0.05?'badge-green':'badge-amber'}">${p_b.toFixed(4)}</span></td></tr>
-    </tbody>
-  </table>`;
-  // Scatter + line
-  const xRange=[Math.min(...xs),Math.max(...xs)];
-  mkChart('regScatterChart',{type:'scatter',data:{datasets:[
-    {data:xs.map((x,i)=>({x,y:ys[i]})),backgroundColor:'rgba(56,139,253,.6)',pointRadius:5,label:'Data'},
-    {type:'line',data:[{x:xRange[0],y:a+b*xRange[0]},{x:xRange[1],y:a+b*xRange[1]}],borderColor:'#f85149',borderWidth:2,pointRadius:0,label:'Fit'},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#8b949e',boxWidth:10,font:{size:11}}}},
-    scales:{x:{title:{display:true,text:xCol,color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{title:{display:true,text:yCol,color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}}}}});
-  mkChart('residChart',{type:'scatter',data:{datasets:[
-    {data:fitted.map((f,i)=>({x:f,y:residuals[i]})),backgroundColor:'rgba(188,140,255,.7)',pointRadius:4},
-    {type:'line',data:[{x:Math.min(...fitted),y:0},{x:Math.max(...fitted),y:0}],borderColor:'rgba(248,81,73,.6)',borderWidth:1.5,pointRadius:0},
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-    scales:{x:{title:{display:true,text:'Fitted values',color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{title:{display:true,text:'Residuals',color:'#8b949e'},ticks:{color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}}}}});
-}
+// TIME SERIES
+function renderTS(){fillSelects();drawTS();}
+function drawTS(){const col=document.getElementById('ts-col')?.value;if(!col)return;const w=parseInt(document.getElementById('ts-w')?.value||5),alpha=parseFloat(document.getElementById('ts-a')?.value||0.3);const vals=DS.rows.map(r=>r[col]).filter(v=>v!==null),n=vals.length;const ma=vals.map((_,i)=>i<w-1?null:sm(vals.slice(i-w+1,i+1)));const es=[vals[0]];for(let i=1;i<n;i++)es.push(alpha*vals[i]+(1-alpha)*es[i-1]);const xs=Array.from({length:n},(_,i)=>i),mx=sm(xs),my=sm(vals);let sxy=0,sxx=0;for(let i=0;i<n;i++){sxy+=(i-mx)*(vals[i]-my);sxx+=(i-mx)**2;}const b=sxy/sxx,a=my-b*mx,trend=xs.map(x=>a+b*x);mkC('tsChart',{type:'line',data:{labels:xs.map(x=>x+1),datasets:[{label:'Original',data:vals,borderColor:'#388bfd',borderWidth:1.5,pointRadius:2,backgroundColor:'transparent'},{label:`MA(${w})`,data:ma,borderColor:'#3fb950',borderWidth:2,pointRadius:0,tension:0.3},{label:`ES(a=${alpha})`,data:es,borderColor:'#d29922',borderWidth:1.5,pointRadius:0,borderDash:[5,3]},{label:'Trend',data:trend,borderColor:'rgba(248,81,73,.6)',borderWidth:1,pointRadius:0,borderDash:[3,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#8b949e',boxWidth:10,font:{size:10}}}},scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e',maxTicksLimit:10}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});const m=sm(vals),varv=vals.reduce((a,x)=>a+(x-m)**2,0)/n;const acf=Array.from({length:Math.min(20,n-1)},(_,lag)=>{let cov=0;for(let i=lag;i<n;i++)cov+=(vals[i]-m)*(vals[i-lag]-m);return+(cov/(n*varv)).toFixed(4);});const sig=1.96/Math.sqrt(n);mkC('acfChart',{type:'bar',data:{labels:acf.map((_,i)=>i),datasets:[{data:acf,backgroundColor:acf.map(v=>Math.abs(v)>sig?'rgba(248,81,73,.7)':'rgba(56,139,253,.6)'),borderRadius:2}]},options:{...GO,plugins:{legend:{display:false}},scales:{...GO.scales,y:{...GO.scales.y,min:-1,max:1}}}});document.getElementById('ts-stats').innerHTML=`<div class="res ${b>=0?'ok':'wa'}"><div class="rt2">Trend</div><div class="kv"><span class="kk">Slope per period</span><span class="kval">${b.toFixed(4)}</span></div><div class="kv"><span class="kk">Direction</span><span class="kval"><span class="bd ${b>0?'bg':b<0?'br':'bb'}">${b>0?'Upward':b<0?'Downward':'Flat'}</span></span></div><div class="kv"><span class="kk">Mean</span><span class="kval">${my.toFixed(3)}</span></div><div class="kv"><span class="kk">Std dev</span><span class="kval">${ss(vals).toFixed(3)}</span></div><div class="kv"><span class="kk">ACF lag-1</span><span class="kval">${acf[1]?.toFixed(3)??'--'} ${Math.abs(acf[1]||0)>sig?'<span class="bd br">autocorrelated</span>':'<span class="bd bg">OK</span>'}</span></div></div>`;}
 
-function runPrediction() {
-  if(!regModel) return;
-  const xNew=parseFloat(document.getElementById('pred-x').value);
-  if(isNaN(xNew)){document.getElementById('pred-result').innerHTML='<div class="result warn"><div class="result-sub">Please enter a valid number.</div></div>';return;}
-  const yHat=regModel.a+regModel.b*xNew;
-  const sePred=regModel.rmse*Math.sqrt(1+1/regModel.n+(xNew-regModel.mx)**2/regModel.sxx);
-  const me=1.96*sePred;
-  document.getElementById('pred-result').innerHTML=`<div class="result pass">
-    <div class="kv-row"><span class="kv-key">x = ${regModel.xCol}</span><span class="kv-val">${xNew}</span></div>
-    <div class="kv-row"><span class="kv-key">ŷ = ${regModel.yCol}</span><span class="kv-val" style="font-size:18px;color:var(--cyan)">${yHat.toFixed(4)}</span></div>
-    <div class="kv-row"><span class="kv-key">95% prediction interval</span><span class="kv-val">[${(yHat-me).toFixed(2)}, ${(yHat+me).toFixed(2)}]</span></div>
-  </div>`;
-}
+// SAMPLING
+function renderSampling(){fillSelects();drawCLT();drawPower();}
+function drawCLT(){const col=document.getElementById('clt-col')?.value;if(!col)return;const n=parseInt(document.getElementById('clt-n')?.value||10),iters=parseInt(document.getElementById('clt-i')?.value||500);const pop=cl(DS.rows.map(r=>r[col]));const means=[];for(let i=0;i<iters;i++){const s=Array.from({length:n},()=>pop[Math.floor(Math.random()*pop.length)]);means.push(sm(s));}const sm2=sm(means),ss2=ss(means),thSE=ss(pop)/Math.sqrt(n);document.getElementById('clt-stats').innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><div class="mc" style="min-width:80px"><div class="ml">Sample mean</div><div class="mv" style="font-size:14px">${sm2.toFixed(2)}</div></div><div class="mc" style="min-width:80px"><div class="ml">SE observed</div><div class="mv" style="font-size:14px">${ss2.toFixed(3)}</div></div><div class="mc" style="min-width:80px"><div class="ml">SE theory</div><div class="mv" style="font-size:14px">${thSE.toFixed(3)}</div></div></div>`;const mn=Math.min(...means),mx=Math.max(...means),bw=(mx-mn)/15;const cnts=Array(15).fill(0);means.forEach(m=>{const i=Math.min(Math.floor((m-mn)/bw),14);cnts[i]++;});mkC('cltChart',{type:'bar',data:{labels:cnts.map((_,i)=>(mn+i*bw).toFixed(1)),datasets:[{data:cnts,backgroundColor:'rgba(63,185,80,.65)',borderRadius:3,borderSkipped:false}]},options:{...GO}});}
+function runBoot(){const col=document.getElementById('boot-col')?.value,stat=document.getElementById('boot-stat')?.value||'mean',B=parseInt(document.getElementById('boot-b')?.value||1000);const v=cl(DS.rows.map(r=>r[col])),n=v.length;const fn={mean:sm,median:smd,sd:ss}[stat]||sm;const boots=[];for(let b=0;b<B;b++){const s=Array.from({length:n},()=>v[Math.floor(Math.random()*n)]);boots.push(fn(s));}boots.sort((a,b)=>a-b);const lo=boots[Math.floor(B*.025)],hi=boots[Math.floor(B*.975)];document.getElementById('boot-res').innerHTML=`<div class="res ok"><div class="rt2">Bootstrap 95% CI - ${stat}(${col})</div><div class="rv2">[${lo.toFixed(3)}, ${hi.toFixed(3)}]</div><div class="kv"><span class="kk">Observed ${stat}</span><span class="kval">${fn(v).toFixed(4)}</span></div><div class="kv"><span class="kk">SE</span><span class="kval">${ss(boots).toFixed(4)}</span></div></div>`;}
+function calcSS(){const goal=document.getElementById('ss-goal')?.value,me=parseFloat(document.getElementById('ss-me')?.value||5),sig=parseFloat(document.getElementById('ss-sigma')?.value||15),alpha=parseFloat(document.getElementById('ss-alpha')?.value||0.05);const z=ninv(1-alpha/2),n=goal==='mean'?Math.ceil((z*sig/me)**2):Math.ceil(z**2*sig*(1-sig)/me**2);document.getElementById('ss-res').innerHTML=`<div class="res ok"><div class="rt2">Required n</div><div class="rv2">${n}</div><div class="rs">z* = ${z.toFixed(3)}, ME = ${me}</div></div>`;}
+function drawPower(){const d=parseFloat(document.getElementById('pw-d')?.value||0.5),alpha=parseFloat(document.getElementById('pw-alpha')?.value||0.05);const ns=Array.from({length:50},(_,i)=>i+2),za=ninv(1-alpha/2);const powers=ns.map(n=>{const ncp=d*Math.sqrt(n);return Math.min(1,ncdf(ncp-za)+ncdf(-ncp-za));});mkC('pwChart',{type:'line',data:{labels:ns,datasets:[{data:powers,borderColor:'#bc8cff',borderWidth:2,pointRadius:0,fill:false,tension:0.3},{type:'line',data:ns.map(()=>0.8),borderColor:'rgba(248,81,73,.4)',borderWidth:1,pointRadius:0,borderDash:[5,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{title:{display:true,text:'Sample size n',color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}},y:{min:0,max:1,title:{display:true,text:'Power',color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});}
 
-// 
-// PROBABILITY CALCULATOR
-// 
-let probDistType='normal';
-let probDistParams={...DIST.normal.params};
+// CHI-SQUARED
+function renderChi(){fillSelects();}
+function runChi(){const rc=document.getElementById('chi-row')?.value,cc=document.getElementById('chi-col2')?.value;if(!rc||!cc)return;const rows=[...new Set(DS.rows.map(r=>r[rc]).filter(v=>v!==null))],cols=[...new Set(DS.rows.map(r=>r[cc]).filter(v=>v!==null))];const obs={};rows.forEach(r=>cols.forEach(c=>{obs[r+'_'+c]=0;}));DS.rows.forEach(r=>{if(r[rc]!==null&&r[cc]!==null)obs[r[rc]+'_'+r[cc]]++;});const N=DS.rows.filter(r=>r[rc]!==null&&r[cc]!==null).length;const rowT=rows.map(r=>cols.reduce((s,c)=>s+(obs[r+'_'+c]||0),0));const colT=cols.map(c=>rows.reduce((s,r)=>s+(obs[r+'_'+c]||0),0));let chi2=0;rows.forEach((r,i)=>cols.forEach((c,j)=>{const e=rowT[i]*colT[j]/N;if(e>0)chi2+=(obs[r+'_'+c]-e)**2/e;}));const df=(rows.length-1)*(cols.length-1);const crit={1:3.841,2:5.991,3:7.815,4:9.488,5:11.07,6:12.59,8:15.51,9:16.92,10:18.31}[df]||df*(1-2/(9*df)+1.645*Math.sqrt(2/(9*df)))**3;const rej=chi2>crit,cramV=Math.sqrt(chi2/(N*Math.min(rows.length-1,cols.length-1)));document.getElementById('chi-res').innerHTML=`<div class="res ${rej?'ko':'ok'}"><div class="rt2">Chi-sq: ${rc} x ${cc}</div>${[['chi2',chi2.toFixed(4)],['df',df],['Critical (a=0.05)',crit.toFixed(3)],["Cramer's V",`${cramV.toFixed(4)} (${cramV<0.1?'negligible':cramV<0.3?'small':cramV<0.5?'medium':'strong'})`],['N',N],['Decision',`<span class="bd ${rej?'br':'bg'}">${rej?'Dependent (reject H0)':'Independent'}</span>`]].map(([k,v])=>`<div class="kv"><span class="kk">${k}</span><span class="kval">${v}</span></div>`).join('')}</div>`;const th=`<tr><th>${rc} / ${cc}</th>${cols.map(c=>`<th>${c}</th>`).join('')}<th>Total</th></tr>`;const trs=rows.map((r,i)=>`<tr><td>${r}</td>${cols.map(c=>`<td class="mo">${obs[r+'_'+c]||0}</td>`).join('')}<td class="mo"><b>${rowT[i]}</b></td></tr>`);const tot=`<tr><td><b>Total</b></td>${colT.map(c=>`<td class="mo"><b>${c}</b></td>`).join('')}<td class="mo"><b>${N}</b></td></tr>`;document.getElementById('chi-tbl').innerHTML=`<table><thead>${th}</thead><tbody>${trs.join('')}${tot}</tbody></table>`;const obsFlat=rows.flatMap(r=>cols.map(c=>obs[r+'_'+c]||0));const expFlat=rows.flatMap((r,i)=>cols.map((_,j)=>rowT[i]*colT[j]/N));mkC('chiChart',{type:'bar',data:{labels:rows.flatMap(r=>cols.map(c=>`${r}-${c}`)),datasets:[{label:'Observed',data:obsFlat,backgroundColor:'rgba(56,139,253,.6)',borderRadius:3},{label:'Expected',data:expFlat,backgroundColor:'rgba(248,81,73,.5)',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#8b949e',boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{size:9}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});}
 
-function renderProbability() {
-  document.getElementById('prob-dist').onchange=e=>{probDistType=e.target.value;probDistParams={...DIST[probDistType].params};buildProbParams();drawProbChart();};
-  document.getElementById('prob-type').onchange=buildProbQueryInputs;
-  buildProbParams();
-  buildProbQueryInputs();
-  drawProbChart();
-}
+// PROBABILITY CALC
+let pDist='normal',pPar={...DIST.normal.params};
+function renderProb(){initProb();buildPQ();drawProbChart();}
+function initProb(){pDist=document.getElementById('pd')?.value||'normal';const d=DIST[pDist];pPar={...d.params};document.getElementById('pp').innerHTML=Object.entries(d.lbls).map(([k,l])=>`<div class="fr"><label>${l}: <span id="ppv-${k}" style="font-family:var(--mo);color:var(--tx)">${pPar[k]}</span></label><input type="range" id="ppr-${k}" min="${d.sl[k].min}" max="${d.sl[k].max}" step="${d.sl[k].step}" value="${pPar[k]}"></div>`).join('');Object.keys(d.lbls).forEach(k=>{document.getElementById('ppr-'+k).oninput=e=>{pPar[k]=+e.target.value;document.getElementById('ppv-'+k).textContent=e.target.value;drawProbChart();};});}
+function buildPQ(){const t=document.getElementById('pt')?.value,el=document.getElementById('pq');if(!el)return;if(t==='leq'||t==='geq')el.innerHTML=`<div class="fr"><label>x</label><input type="number" id="pqx" value="0" step="0.1" style="width:90px"></div>`;else if(t==='between')el.innerHTML=`<div class="fr"><label>a</label><input type="number" id="pqa" value="-1" step="0.1" style="width:80px"><label>b</label><input type="number" id="pqb" value="1" step="0.1" style="width:80px"></div>`;else el.innerHTML=`<div class="fr"><label>p =</label><input type="number" id="pqp" value="0.975" min="0.001" max="0.999" step="0.001" style="width:90px"></div>`;}
+function calcProb(){const t=document.getElementById('pt')?.value,d=DIST[pDist];let txt='';if(t==='leq'){const x=parseFloat(document.getElementById('pqx')?.value||0);txt=`P(X &lt;= ${x}) = <strong style="color:var(--cy)">${d.cdf(x,pPar).toFixed(6)}</strong>`;}else if(t==='geq'){const x=parseFloat(document.getElementById('pqx')?.value||0);txt=`P(X &gt;= ${x}) = <strong style="color:var(--cy)">${(1-d.cdf(x,pPar)).toFixed(6)}</strong>`;}else if(t==='between'){const a=parseFloat(document.getElementById('pqa')?.value||-1),b=parseFloat(document.getElementById('pqb')?.value||1);txt=`P(${a} &lt;= X &lt;= ${b}) = <strong style="color:var(--cy)">${(d.cdf(b,pPar)-d.cdf(a,pPar)).toFixed(6)}</strong>`;}else{const p=parseFloat(document.getElementById('pqp')?.value||.975),x=d.inv?d.inv(p,pPar):0;txt=`Q(p=${p}) = x = <strong style="color:var(--cy)">${x.toFixed(6)}</strong>`;}document.getElementById('prob-res').innerHTML=`<div class="res ok"><div style="font-size:13px">${txt}</div></div>`;}
+function drawProbChart(){const d=DIST[pDist];const[lo,hi]=d.range(pPar);const N=d.discrete?Math.min(hi-lo+1,50):100;const xs=d.discrete?Array.from({length:N},(_,i)=>lo+i):Array.from({length:N},(_,i)=>lo+i*(hi-lo)/(N-1));mkC('probChart',{type:d.discrete?'bar':'line',data:{labels:xs.map(x=>x.toFixed(d.discrete?0:2)),datasets:[{data:xs.map(x=>d.pdf(x,pPar)),backgroundColor:d.discrete?'rgba(56,139,253,.6)':'rgba(56,139,253,.12)',borderColor:'#388bfd',borderWidth:2,pointRadius:0,fill:!d.discrete,tension:0.3}]},options:{...GO}});}
 
-function buildProbParams() {
-  const d=DIST[probDistType];
-  document.getElementById('prob-params').innerHTML=Object.entries(d.labels).map(([k,lbl])=>`
-    <div class="form-row">
-      <label>${lbl}: <span id="pp-v-${k}" style="font-family:var(--mono);color:var(--text)">${probDistParams[k]}</span></label>
-      <input type="range" id="pp-${k}" min="${d.sliders[k].min}" max="${d.sliders[k].max}" step="${d.sliders[k].step}" value="${probDistParams[k]}">
-    </div>`).join('');
-  Object.keys(d.labels).forEach(k=>{
-    document.getElementById('pp-'+k).oninput=e=>{
-      probDistParams[k]=+e.target.value;
-      document.getElementById('pp-v-'+k).textContent=e.target.value;
-      drawProbChart();
-    };
-  });
-}
+// DATA STORY
+function genStory(){const ins=[];DS.num.forEach(col=>{const vals=DS.rows.map(r=>r[col]),v=cl(vals),d=desc(v),miss=vals.filter(x=>x===null).length;if(miss>0)ins.push({tag:'MISS',color:'var(--am)',title:`Missing data in "${col}"`,body:`${miss} of ${vals.length} values (${(miss/vals.length*100).toFixed(1)}%) are missing. Consider imputation in the Cleaning tab.`});if(Math.abs(d.skew)>1)ins.push({tag:'SKEW',color:'var(--pu)',title:`"${col}" is skewed (${d.skew.toFixed(2)})`,body:d.skew>0?`Right-skewed: mean (${d.mean.toFixed(1)}) > median (${d.med.toFixed(1)}). Log transform may help.`:`Left-skewed: mean (${d.mean.toFixed(1)}) < median (${d.med.toFixed(1)}).`});if(d.cv>40)ins.push({tag:'VAR',color:'var(--rd)',title:`High variability in "${col}"`,body:`CV = ${d.cv.toFixed(1)}%. Range: ${d.min} to ${d.max}, IQR = ${d.iqr.toFixed(1)}.`});const q1=d.q1,q3=d.q3,fence=1.5*(q3-q1),outs=v.filter(x=>x<q1-fence||x>q3+fence);if(outs.length>0)ins.push({tag:'OUT',color:'var(--rd)',title:`${outs.length} outlier(s) in "${col}"`,body:`IQR fence: [${(q1-fence).toFixed(1)}, ${(q3+fence).toFixed(1)}]. Values: ${outs.slice(0,5).join(', ')}${outs.length>5?'...':''}.`});});
+DS.num.forEach((c1,i)=>DS.num.slice(i+1).forEach(c2=>{const v1=cl(DS.rows.map(r=>r[c1])),v2=cl(DS.rows.map(r=>r[c2])),r=pr(v1.slice(0,Math.min(v1.length,v2.length)),v2.slice(0,Math.min(v1.length,v2.length)));if(Math.abs(r)>0.6)ins.push({tag:'CORR',color:'var(--cy)',title:`Strong correlation: "${c1}" & "${c2}" (r = ${r.toFixed(3)})`,body:`${Math.abs(r)>0.8?'Very strong':Math.abs(r)>0.6?'Strong':''} ${r>0?'positive':'negative'} linear relationship. Consider regression.`});}));
+if(DS.cat.length){const col=DS.cat[0];const freq={};DS.rows.forEach(r=>{if(r[col]!==null)freq[r[col]]=(freq[r[col]]||0)+1;});const entries=Object.entries(freq).sort((a,b)=>b[1]-a[1]);const dom=entries[0],rare=entries[entries.length-1];ins.push({tag:'CAT',color:'var(--bl)',title:`Category distribution: "${col}"`,body:`Most common: "${dom[0]}" (${dom[1]} rows, ${(dom[1]/DS.rows.length*100).toFixed(0)}%). Least: "${rare[0]}" (${rare[1]} rows). ${entries.length} categories total.`});}
+const missCols=DS.cols.filter(c=>DS.meta.cols[c].missing>0);if(missCols.length===0)ins.push({tag:'OK',color:'var(--gn)',title:'No missing values',body:`All ${DS.meta.rowCount} x ${DS.meta.colCount} cells are complete.`});
+ins.push({tag:'INFO',color:'var(--bl)',title:'Dataset overview',body:`${DS.meta.rowCount} rows, ${DS.meta.colCount} columns (${DS.num.length} numeric, ${DS.cat.length} categorical). Completeness: ${(100-DS.meta.totalMissing/(DS.meta.rowCount*DS.meta.colCount)*100).toFixed(1)}%.`});
+document.getElementById('story-out').innerHTML=ins.map(ins=>`<div class="sc" style="border-left-color:${ins.color}"><div class="si">${ins.tag}</div><div class="st">${ins.title}</div><div class="sb">${ins.body}</div></div>`).join('');}
 
-function buildProbQueryInputs() {
-  const t=document.getElementById('prob-type').value;
-  const el=document.getElementById('prob-query-inputs');
-  if(t==='leq'||t==='geq') el.innerHTML=`<div class="form-row"><label>x value</label><input type="number" id="pq-x" value="0" step="0.1" style="width:100px"></div>`;
-  else if(t==='between') el.innerHTML=`<div class="form-row"><label>a</label><input type="number" id="pq-a" value="-1" step="0.1" style="width:90px"><label>b</label><input type="number" id="pq-b" value="1" step="0.1" style="width:90px"></div>`;
-  else el.innerHTML=`<div class="form-row"><label>p =</label><input type="number" id="pq-p" value="0.975" min="0.001" max="0.999" step="0.001" style="width:100px"></div>`;
-}
-
-function calcProbability() {
-  const t=document.getElementById('prob-type').value;
-  const d=DIST[probDistType];
-  let result='',prob=0;
-  if(t==='leq'){
-    const x=parseFloat(document.getElementById('pq-x')?.value||0);
-    prob=d.cdf(x,probDistParams);
-    result=`P(X ≤ ${x}) = <strong>${prob.toFixed(6)}</strong>`;
-  } else if(t==='geq'){
-    const x=parseFloat(document.getElementById('pq-x')?.value||0);
-    prob=1-d.cdf(x,probDistParams);
-    result=`P(X ≥ ${x}) = <strong>${prob.toFixed(6)}</strong>`;
-  } else if(t==='between'){
-    const a=parseFloat(document.getElementById('pq-a')?.value||-1);
-    const b=parseFloat(document.getElementById('pq-b')?.value||1);
-    prob=d.cdf(b,probDistParams)-d.cdf(a,probDistParams);
-    result=`P(${a} ≤ X ≤ ${b}) = <strong>${prob.toFixed(6)}</strong>`;
-  } else {
-    const p=parseFloat(document.getElementById('pq-p')?.value||0.975);
-    const x=d.inv?d.inv(p,probDistParams):bisectionInv(d,probDistParams,p);
-    result=`Quantile: P(X ≤ x) = ${p} → x = <strong>${x.toFixed(6)}</strong>`;
-  }
-  document.getElementById('prob-result').innerHTML=`<div class="result pass"><div class="result-val" style="font-size:16px">${result}</div></div>`;
-  drawProbChart();
-}
-
-function bisectionInv(d,p,prob,lo=-100,hi=100){
-  for(let i=0;i<100;i++){const mid=(lo+hi)/2;if(d.cdf(mid,p)<prob)lo=mid;else hi=mid;if(hi-lo<1e-6)break;}return(lo+hi)/2;
-}
-
-function drawProbChart() {
-  const d=DIST[probDistType];
-  const [lo,hi]=d.range(probDistParams);
-  const N=d.discrete?Math.min(hi-lo+1,50):100;
-  const xs=d.discrete?Array.from({length:N},(_,i)=>lo+i):Array.from({length:N},(_,i)=>lo+i*(hi-lo)/(N-1));
-  const pdfs=xs.map(x=>d.pdf(x,probDistParams));
-  const labels=xs.map(x=>x.toFixed(d.discrete?0:2));
-  mkChart('probChart',{type:d.discrete?'bar':'line',data:{labels,datasets:[{data:pdfs,backgroundColor:d.discrete?'rgba(56,139,253,.6)':'rgba(56,139,253,.15)',borderColor:'#388bfd',borderWidth:2,pointRadius:0,fill:!d.discrete,tension:0.3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:8,color:'#8b949e'},grid:{color:'rgba(255,255,255,.05)'}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8b949e'}}}}});
-}
-
-// 
 // INIT
-// 
-parseCSV(SAMPLE_CSV);
-populateAllSelects();
+parseCSV(SAMPLE);
+fillSelects();
 renderExplorer();
 </script>
 </body>
